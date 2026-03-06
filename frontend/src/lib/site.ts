@@ -1,0 +1,45 @@
+export const site = {
+  name: 'FitLife',
+  title: 'FitLife - AI Fitness and Nutrition Coach',
+  description:
+    'FitLife is a full-stack wellness app that combines OCR nutrition scans, pose-based workout feedback, and an AI coach into one daily training workflow.',
+  contactEmail: 'hello@fitlife.app',
+};
+
+export const navLinks = [
+  { href: '/nutri-ai', label: 'Fuel Scan' },
+  { href: '/muscle-ai', label: 'Form Coach' },
+  { href: '/ana', label: 'FitLife Coach' },
+  { href: '/pricing', label: 'Plans' },
+  { href: '/developers', label: 'Architecture' },
+];
+
+export const products = [
+  {
+    href: '/nutri-ai',
+    badge: 'OCR + scoring',
+    title: 'Fuel Scan',
+    desc: 'Scan packaged food labels, surface the macro tradeoffs, and get recommendations matched to your goal.',
+  },
+  {
+    href: '/muscle-ai',
+    badge: 'Pose analysis',
+    title: 'Form Coach',
+    desc: 'Upload a lifting clip and get rep counts, posture cues, and injury-risk feedback in one workflow.',
+  },
+  {
+    href: '/ana',
+    badge: 'RAG coach',
+    title: 'FitLife Coach',
+    desc: 'Ask for meal ideas, recovery suggestions, and ingredient swaps from a nutrition-aware AI assistant.',
+  },
+];
+
+export const stackHighlights = [
+  'Next.js 15 + React 19 frontend',
+  'Flask API gateway with JWT auth',
+  'OCR label extraction pipeline',
+  'YOLOv8-based workout analysis',
+  'RAG meal coach with chat history',
+  'Dashboard flows for scans and workouts',
+];

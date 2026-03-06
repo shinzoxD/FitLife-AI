@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Contact — FitLife{% endblock %}
+
+{% block content %}
+<div class="page-header" style="background: var(--gradient-hero); text-align: center;">
+  <div class="container">
+    <h1 style="font-size: var(--text-4xl); margin-bottom: var(--space-4);">Get in Touch</h1>
+    <p style="font-size: var(--text-lg); max-width: 600px; margin: 0 auto;">
+      Have questions, partnership inquiries, or want to learn more? We'd love to hear from you.
+    </p>
+  </div>
+</div>
+
+<section style="padding: var(--space-12) 0;">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-12); max-width: 1000px; margin: 0 auto;">
+      
+      <!-- Contact Info -->
+      <div>
+        <h2 style="margin-bottom: var(--space-6);">Reach Out</h2>
+        
+        <div class="card" style="margin-bottom: var(--space-6);">
+          <h3 style="margin-bottom: var(--space-4);">Project Contact</h3>
+          <p style="color: var(--text-secondary); margin: 0;">
+            Replace these placeholder channels with your preferred portfolio email, business inbox, or social profile before sharing the public demo.
+          </p>
+        </div>
+
+        <div class="card" style="margin-bottom: var(--space-6);">
+          <h4 style="margin-bottom: var(--space-3);">General Inquiries</h4>
+          <a href="mailto:hello@fitlife.ai" style="color: var(--accent-primary);">hello@fitlife.ai</a>
+        </div>
+        
+        <div class="card" style="margin-bottom: var(--space-6);">
+          <h4 style="margin-bottom: var(--space-3);">Enterprise & Partnerships</h4>
+          <a href="mailto:enterprise@fitlife.ai" style="color: var(--accent-primary);">enterprise@fitlife.ai</a>
+        </div>
+        
+        <div class="card">
+          <h4 style="margin-bottom: var(--space-3);">Developer Support</h4>
+          <a href="mailto:developers@fitlife.ai" style="color: var(--accent-primary);">developers@fitlife.ai</a>
+        </div>
+      </div>
+      
+      <!-- Contact Form -->
+      <div>
+        <h2 style="margin-bottom: var(--space-6);">Send a Message</h2>
+        
+        <form class="card" style="padding: var(--space-6);">
+          <div class="form-group">
+            <label class="form-label" for="name">Name</label>
+            <input type="text" id="name" name="name" class="form-input" required placeholder="Your name">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            <input type="email" id="email" name="email" class="form-input" required placeholder="you@example.com">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="subject">Subject</label>
+            <select id="subject" name="subject" class="form-input" required>
+              <option value="">Select a topic...</option>
+              <option value="general">General Inquiry</option>
+              <option value="enterprise">Enterprise / Partnership</option>
+              <option value="api">API Access</option>
+              <option value="support">Technical Support</option>
+              <option value="feature">Feature Request</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="message">Message</label>
+            <textarea id="message" name="message" class="form-input" required placeholder="Tell us more..." rows="5" style="resize: vertical;"></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+            Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Office Location (Optional) -->
+    <div style="text-align: center; margin-top: var(--space-16);">
+      <h3 style="margin-bottom: var(--space-4);">Based in India, building for the world</h3>
+      <p style="color: var(--text-tertiary);">
+        FitLife is a globally-minded health technology company.
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

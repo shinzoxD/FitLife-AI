@@ -169,12 +169,12 @@ See `env.example` for all configuration options. The only required variable for 
 
 ### Render (frontend + backend)
 
-The repo now includes a two-service `render.yaml` Blueprint:
+The repo includes a two-service `render.yaml` Blueprint that is configured for Render's free tier:
 
 - `fitlife-ai-web` runs the Next.js frontend from `frontend/`
 - `fitlife-ai-api` runs the Flask gateway from the repo root
 
-The frontend proxies `/api/*` to the backend over Render's private network through `INTERNAL_API_HOSTPORT`, so you do not need to expose a public backend URL to the browser for the default setup.
+Because free web services cannot use Render private networking, the frontend should call the backend through its public Render URL.
 
 Set these backend variables in Render:
 
@@ -183,6 +183,10 @@ Set these backend variables in Render:
 - `GROQ_API_KEY`
 - `FRONTEND_URL=https://your-frontend-service.onrender.com`
 - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` if you want Google auth
+
+Set this frontend variable in Render after the backend service URL is known:
+
+- `NEXT_PUBLIC_API_URL=https://your-backend-service.onrender.com`
 
 Notes:
 

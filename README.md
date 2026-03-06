@@ -34,7 +34,7 @@ The goal of this version is to present the project as a polished portfolio app: 
 | AI / ML | YOLOv8, EasyOCR, Groq (Llama 3), RAG retrieval |
 | Async Tasks | Celery + Redis |
 | Database | SQLite (dev), PostgreSQL-ready |
-| Deployment | Render Blueprint (frontend + backend), Vercel optional |
+| Deployment | Vercel (frontend) + Koyeb (backend), Render optional |
 
 ---
 
@@ -167,33 +167,44 @@ See `env.example` for all configuration options. The only required variable for 
 
 ## Deployment
 
-### Render (frontend + backend)
+### Free Path: Vercel + Koyeb
 
-The repo includes a two-service `render.yaml` Blueprint that is configured for Render's free tier:
+This repo is set up for a free split deployment:
 
-- `fitlife-ai-web` runs the Next.js frontend from `frontend/`
-- `fitlife-ai-api` runs the Flask gateway from the repo root
+- `Vercel` hosts the Next.js frontend from `frontend/`
+- `Koyeb` hosts the Flask gateway from the repo root using the included `Dockerfile`
 
-Because free web services cannot use Render private networking, the frontend should call the backend through its public Render URL.
+#### 1. Deploy the frontend on Vercel
 
-Set these backend variables in Render:
+- Import the GitHub repo into Vercel
+- Keep the existing root directory from `vercel.json`:
+  - `frontend`
+- Set:
+  - `NEXT_PUBLIC_API_URL=https://your-koyeb-backend.koyeb.app`
 
-- `SECRET_KEY`
-- `JWT_SECRET_KEY`
-- `GROQ_API_KEY`
-- `FRONTEND_URL=https://your-frontend-service.onrender.com`
-- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` if you want Google auth
+#### 2. Deploy the backend on Koyeb
 
-Set this frontend variable in Render after the backend service URL is known:
+- Create a new Web Service from the same GitHub repo
+- Deploy from the repo root so Koyeb uses the included `Dockerfile`
+- Set these environment variables:
+  - `SECRET_KEY`
+  - `JWT_SECRET_KEY`
+  - `GROQ_API_KEY`
+  - `FRONTEND_URL=https://your-vercel-app.vercel.app`
+  - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` if you want Google auth
 
-- `NEXT_PUBLIC_API_URL=https://your-backend-service.onrender.com`
+#### 3. Redeploy both once
+
+- After Koyeb gives you the backend URL, update `NEXT_PUBLIC_API_URL` in Vercel
+- After Vercel gives you the frontend URL, update `FRONTEND_URL` in Koyeb
+- Redeploy both services once so CORS and frontend API calls point to the final domains
 
 Notes:
 
-- `requirements-render.txt` is the lean deployment dependency set for the API gateway.
+- The backend container uses `requirements-render.txt` as the lightweight deployment dependency set for the API gateway.
 - The default SQLite database is fine for a portfolio deploy, but PostgreSQL is the better production choice.
 - If you want async Form Coach jobs in production, add Redis and Celery worker infrastructure.
-- `vercel.json` is still included if you prefer to split frontend/backend hosting later.
+- `render.yaml` is still included if you prefer Render later.
 
 ## Resume Positioning
 

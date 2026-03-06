@@ -1,9 +1,24 @@
 services:
   - type: web
-    name: fitlife-api
+    name: fitlife-ai-web
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start -- --hostname 0.0.0.0 --port $PORT
+    envVars:
+      - key: NODE_VERSION
+        value: "20.19.0"
+      - key: INTERNAL_API_HOSTPORT
+        fromService:
+          type: web
+          name: fitlife-ai-api
+          property: hostport
+  - type: web
+    name: fitlife-ai-api
     runtime: python
     buildCommand: pip install -r requirements-render.txt
     startCommand: gunicorn gateway.app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.6"

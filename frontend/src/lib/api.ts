@@ -1,4 +1,4 @@
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '') + '/api/v1';
+const API_BASE = `${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1`;
 
 function getTokens() {
   if (typeof window === 'undefined') return { access: null, refresh: null };

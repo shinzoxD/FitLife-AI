@@ -34,7 +34,7 @@ The goal of this version is to present the project as a polished portfolio app: 
 | AI / ML | YOLOv8, EasyOCR, Groq (Llama 3), RAG retrieval |
 | Async Tasks | Celery + Redis |
 | Database | SQLite (dev), PostgreSQL-ready |
-| Deployment | Vercel (frontend), any WSGI server (backend) |
+| Deployment | Render Blueprint (frontend + backend), Vercel optional |
 
 ---
 
@@ -167,20 +167,21 @@ See `env.example` for all configuration options. The only required variable for 
 
 ## Deployment
 
-### Frontend (Vercel)
+### Render (frontend + backend)
 
-The Next.js frontend is already configured with `vercel.json` to use `frontend/` as the root directory. In Vercel, add:
+The repo now includes a two-service `render.yaml` Blueprint:
 
-- `NEXT_PUBLIC_API_URL=https://your-backend-domain`
+- `fitlife-ai-web` runs the Next.js frontend from `frontend/`
+- `fitlife-ai-api` runs the Flask gateway from the repo root
 
-### Backend (Render or Railway)
+The frontend proxies `/api/*` to the backend over Render's private network through `INTERNAL_API_HOSTPORT`, so you do not need to expose a public backend URL to the browser for the default setup.
 
-The repo includes `render.yaml` for a lightweight Flask gateway deployment. Configure these variables on the backend host:
+Set these backend variables in Render:
 
 - `SECRET_KEY`
 - `JWT_SECRET_KEY`
 - `GROQ_API_KEY`
-- `FRONTEND_URL=https://your-frontend-domain`
+- `FRONTEND_URL=https://your-frontend-service.onrender.com`
 - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` if you want Google auth
 
 Notes:
@@ -188,6 +189,7 @@ Notes:
 - `requirements-render.txt` is the lean deployment dependency set for the API gateway.
 - The default SQLite database is fine for a portfolio deploy, but PostgreSQL is the better production choice.
 - If you want async Form Coach jobs in production, add Redis and Celery worker infrastructure.
+- `vercel.json` is still included if you prefer to split frontend/backend hosting later.
 
 ## Resume Positioning
 

@@ -2,6 +2,8 @@
 YOLO model loader module
 """
 import logging
+from functools import lru_cache
+from pathlib import Path
 import torch
 
 from ...config.settings import Config
@@ -18,6 +20,7 @@ def setup_gpu():
     logger.info("CUDA not available. Using CPU")
     return False
 
+@lru_cache(maxsize=1)
 def get_yolo_models():
     """Load and optimize YOLO models"""
     try:
@@ -28,6 +31,8 @@ def get_yolo_models():
         models = {}
         
         for exercise_type, model_path in Config.MODEL_PATHS.items():
+            if not Path(model_path).exists():
+                raise FileNotFoundError(f"Missing model checkpoint for {exercise_type}: {model_path}")
             models[exercise_type] = YOLO(model_path)
         
         # Optimize for GPU if available

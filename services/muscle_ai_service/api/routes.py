@@ -11,13 +11,11 @@ from pathlib import Path
 
 # Import service core modules
 try:
-    from ..core.models.analyzer import MovementAnalyzer
+    from ..core.analysis import analyze_saved_video
     from ..core.models.yolo import get_yolo_models
-    from ..utils.video import process_video
 except ImportError:
-    MovementAnalyzer = None
+    analyze_saved_video = None
     get_yolo_models = None
-    process_video = None
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +58,34 @@ def init_models():
             models = {}
 
 
+def _save_upload(file_storage) -> Path:
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    base_filename = os.path.splitext(file_storage.filename)[0]
+    filename = f"{timestamp}_{base_filename}.mp4"
+    video_path = VIDEO_FOLDER / filename
+    file_storage.save(str(video_path))
+    logger.info(f"Saved video: {video_path}")
+    return video_path
+
+
+def _validate_upload_request():
+    if 'video' not in request.files:
+        return 'No video file uploaded'
+
+    file = request.files['video']
+    if file.filename == '':
+        return 'No selected file'
+
+    if not file.filename.lower().endswith(('.mp4', '.avi', '.mov')):
+        return 'Invalid file type. Please upload MP4, AVI, or MOV files'
+
+    exercise_type = request.form.get('exercise_type')
+    if exercise_type not in SUPPORTED_EXERCISES:
+        return 'Invalid exercise type'
+
+    return None
+
+
 @muscle_ai_bp.route('/')
 @muscle_ai_bp.route('/index')
 def index():
@@ -77,86 +103,42 @@ def upload():
     """Handle video upload and processing"""
     init_models()
     gateway_url = os.environ.get('GATEWAY_URL', 'http://127.0.0.1:5000').rstrip('/')
-    
-    if 'video' not in request.files:
+    error_message = _validate_upload_request()
+    if error_message:
         return render_template(
             'muscle-ai/index.html',
-            message='No video file uploaded',
+            message=error_message,
             gateway_url=gateway_url,
             supported_exercises=SUPPORTED_EXERCISES
         )
-    
+
     file = request.files['video']
-    if file.filename == '':
-        return render_template(
-            'muscle-ai/index.html',
-            message='No selected file',
-            gateway_url=gateway_url,
-            supported_exercises=SUPPORTED_EXERCISES
-        )
-    
-    if not file.filename.lower().endswith(('.mp4', '.avi', '.mov')):
-        return render_template(
-            'muscle-ai/index.html',
-            message='Invalid file type. Please upload MP4, AVI, or MOV files',
-            gateway_url=gateway_url,
-            supported_exercises=SUPPORTED_EXERCISES
-        )
-    
     exercise_type = request.form.get('exercise_type')
-    if exercise_type not in SUPPORTED_EXERCISES:
-        return render_template(
-            'muscle-ai/index.html',
-            message='Invalid exercise type',
-            gateway_url=gateway_url,
-            supported_exercises=SUPPORTED_EXERCISES
-        )
-    
+
     try:
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        base_filename = os.path.splitext(file.filename)[0]
-        filename = f"{timestamp}_{base_filename}"
-        
-        video_path = VIDEO_FOLDER / f"{filename}.mp4"
-        processed_path = PROCESSED_FOLDER / f"processed_{filename}.mp4"
-        web_filename = f'web_{filename}.mp4'
-        web_path = WEB_FOLDER / web_filename
-        
-        file.save(str(video_path))
-        logger.info(f"Saved video: {video_path}")
-        
-        if models and exercise_type in models:
-            metrics = process_video(
-                str(video_path),
-                str(processed_path),
-                str(web_path),
-                exercise_type,
-                models[exercise_type]
-            )
-            
-            if video_path.exists():
-                video_path.unlink()
-            if processed_path.exists():
-                processed_path.unlink()
-            
-            return render_template(
-                'muscle-ai/index.html',
-                video_url=url_for('static', filename=f'videos/{web_filename}'),
-                movement_analysis={
-                    'score': metrics['movement_assessment']['score'],
-                    'metrics': metrics
-                },
-                gateway_url=gateway_url,
-                supported_exercises=SUPPORTED_EXERCISES
-            )
-        else:
+        if not models or exercise_type not in models or analyze_saved_video is None:
             return render_template(
                 'muscle-ai/index.html',
                 message=f'Model for {exercise_type} not available',
                 gateway_url=gateway_url,
                 supported_exercises=SUPPORTED_EXERCISES
             )
-            
+
+        video_path = _save_upload(file)
+        result = analyze_saved_video(video_path, exercise_type)
+        if video_path.exists():
+            video_path.unlink()
+
+        return render_template(
+            'muscle-ai/index.html',
+            video_url=result.get('video_url'),
+            movement_analysis={
+                'score': result['form_score'],
+                'metrics': result,
+            },
+            gateway_url=gateway_url,
+            supported_exercises=SUPPORTED_EXERCISES
+        )
     except Exception as e:
         logger.error(f"Error processing upload: {e}", exc_info=True)
         return render_template(
@@ -165,6 +147,31 @@ def upload():
             gateway_url=gateway_url,
             supported_exercises=SUPPORTED_EXERCISES
         )
+
+
+@muscle_ai_bp.route('/api/analyze', methods=['POST'])
+def api_analyze():
+    """Handle JSON-based upload and analysis for gateway consumers."""
+    init_models()
+    error_message = _validate_upload_request()
+    if error_message:
+        return jsonify({'error': error_message}), 400
+
+    file = request.files['video']
+    exercise_type = request.form.get('exercise_type')
+
+    try:
+        if not models or exercise_type not in models or analyze_saved_video is None:
+            return jsonify({'error': f'Model for {exercise_type} not available'}), 503
+
+        video_path = _save_upload(file)
+        result = analyze_saved_video(video_path, exercise_type)
+        if video_path.exists():
+            video_path.unlink()
+        return jsonify(result), 200
+    except Exception as e:
+        logger.error(f"Error processing API upload: {e}", exc_info=True)
+        return jsonify({'error': f'Error processing video: {str(e)}'}), 500
 
 
 @muscle_ai_bp.route('/api/exercises', methods=['GET'])

@@ -18,21 +18,28 @@ def analyze_video(self, video_path: str, exercise_type: str) -> dict:
         return {'error': 'Video file not found', 'status': 'failed'}
 
     try:
-        with open(video_path, 'rb') as f:
-            files = {'video': (video.name, f, 'video/mp4')}
-            data = {'exercise_type': exercise_type}
-            resp = requests.post(
-                f'{MUSCLE_AI_URL}/muscle/upload',
-                files=files,
-                data=data,
-                timeout=120,
-            )
+        try:
+            from services.muscle_ai_service.core.analysis import analyze_saved_video
 
-        if video.exists():
-            video.unlink()
+            result = analyze_saved_video(video, exercise_type)
+            return {'status': 'completed', 'result': result}
+        except Exception:
+            with open(video_path, 'rb') as f:
+                files = {'video': (video.name, f, 'video/mp4')}
+                data = {'exercise_type': exercise_type}
+                resp = requests.post(
+                    f'{MUSCLE_AI_URL}/muscle/api/analyze',
+                    files=files,
+                    data=data,
+                    timeout=300,
+                )
 
-        if resp.status_code == 200:
-            return {'status': 'completed', 'result': resp.json() if resp.headers.get('content-type', '').startswith('application/json') else {'html': resp.text}}
-        return {'status': 'failed', 'error': f'Service returned {resp.status_code}'}
+            if resp.status_code == 200:
+                return {'status': 'completed', 'result': resp.json()}
+            body = resp.json() if resp.headers.get('content-type', '').startswith('application/json') else {'error': f'Service returned {resp.status_code}'}
+            return {'status': 'failed', 'error': body.get('error', f'Service returned {resp.status_code}')}
     except Exception as exc:
         return {'status': 'failed', 'error': str(exc)}
+    finally:
+        if video.exists():
+            video.unlink()

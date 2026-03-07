@@ -2,6 +2,19 @@
 Application configuration
 """
 import os
+from pathlib import Path
+
+
+def _resolve_model_dir() -> Path:
+    candidates = [
+        Path(os.path.abspath("./data/ml-models/yolo")),
+        Path(os.path.abspath("./model/models")),
+        Path(os.path.abspath("./model/muscle_ai/models")),
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
 
 class Config:
     """Application configuration settings"""
@@ -32,12 +45,14 @@ class Config:
     #     'zercher_squat': 'models/zercher_best.pt',
     #     'front_squat': 'models/front_squats_best.pt'
     # }
-    # Model paths (kept in repo under data/ml-models/yolo)
+    MODEL_DIR = _resolve_model_dir()
+
+    # Model paths
     MODEL_PATHS = {
-        'regular_deadlift': os.path.abspath('./data/ml-models/yolo/best.pt'),
-        'sumo_deadlift': os.path.abspath('./data/ml-models/yolo/sumo_best.pt'),
-        'squat': os.path.abspath('./data/ml-models/yolo/squats_best.pt'),
-        'romanian_deadlift': os.path.abspath('./data/ml-models/yolo/best_romanian.pt'),
-        'zercher_squat': os.path.abspath('./data/ml-models/yolo/zercher_best.pt'),
-        'front_squat': os.path.abspath('./data/ml-models/yolo/front_squats_best.pt'),
+        'regular_deadlift': str(MODEL_DIR / 'best.pt'),
+        'sumo_deadlift': str(MODEL_DIR / 'sumo_best.pt'),
+        'squat': str(MODEL_DIR / 'squats_best.pt'),
+        'romanian_deadlift': str(MODEL_DIR / 'best_romanian.pt'),
+        'zercher_squat': str(MODEL_DIR / 'zercher_best.pt'),
+        'front_squat': str(MODEL_DIR / 'front_squats_best.pt'),
     }

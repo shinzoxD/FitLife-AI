@@ -69,6 +69,40 @@ export interface ChatMessage {
 export interface MuscleTaskStatus {
   task_id: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
-  result?: Record<string, unknown> | null;
+  result?: MuscleAnalysisResult | null;
   error?: string;
+}
+
+export interface MuscleAnalysisResult {
+  exercise_type: string;
+  exercise_label?: string;
+  form_score: number;
+  score?: number;
+  raw_score?: number;
+  reps: number;
+  rep_count?: number;
+  frames_analyzed?: number;
+  duration_seconds?: number;
+  feedback?: string[];
+  recommendations?: string[];
+  video_url?: string | null;
+  movement_assessment?: {
+    form_quality?: number;
+    depth_quality?: number;
+    form_consistency?: number;
+    depth_consistency?: number;
+    score?: number;
+  };
+  form_metrics?: {
+    average?: number;
+    min?: number;
+    max?: number;
+    consistency?: number;
+  };
+  depth_metrics?: {
+    average?: number;
+    min?: number;
+    max?: number;
+    consistency?: number;
+  };
 }

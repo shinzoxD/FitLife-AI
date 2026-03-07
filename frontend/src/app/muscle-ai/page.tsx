@@ -3,14 +3,14 @@
 import { useState, useCallback } from 'react';
 import { apiFetch } from '@/lib/api';
 import { usePolling } from '@/hooks/usePolling';
-import type { MuscleTaskStatus } from '@/lib/types';
+import type { MuscleAnalysisResult, MuscleTaskStatus } from '@/lib/types';
 import ExerciseSelect from '@/components/muscle-ai/ExerciseSelect';
 import VideoUpload from '@/components/muscle-ai/VideoUpload';
 import AnalysisResults from '@/components/muscle-ai/AnalysisResults';
 import Button from '@/components/ui/Button';
 import Alert from '@/components/ui/Alert';
 
-type UploadResponse = Record<string, unknown> & {
+type UploadResponse = Partial<MuscleAnalysisResult> & {
   task_id?: string;
 };
 
@@ -20,7 +20,7 @@ export default function MuscleAIPage() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [taskId, setTaskId] = useState('');
-  const [syncResult, setSyncResult] = useState<Record<string, unknown> | null>(null);
+  const [syncResult, setSyncResult] = useState<MuscleAnalysisResult | null>(null);
 
   const fetcher = useCallback(
     () => apiFetch<MuscleTaskStatus>(`/muscle-ai/task/${taskId}`),
@@ -49,7 +49,7 @@ export default function MuscleAIPage() {
         setTaskId(result.task_id);
         setTimeout(() => startPolling(), 500);
       } else {
-        setSyncResult(result);
+        setSyncResult(result as MuscleAnalysisResult);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Upload failed');

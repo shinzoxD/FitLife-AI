@@ -81,6 +81,46 @@ def _proxy_request(target_url: str) -> Response:
         return jsonify({'error': 'Service unavailable', 'details': str(e)}), 503
 
 
+def _absolute_url(path: str | None) -> str | None:
+    if not path:
+        return None
+    if path.startswith('http://') or path.startswith('https://'):
+        return path
+    return f"{request.host_url.rstrip('/')}{path}"
+
+
+def _save_workout_session(user_id: int | None, exercise_type: str, result: dict) -> None:
+    if not user_id:
+        return
+
+    movement = result.get('movement_assessment') or {}
+    form_consistency = float(movement.get('form_consistency', 0) or 0) * 10
+    depth_consistency = float(movement.get('depth_consistency', 0) or 0) * 10
+
+    session = WorkoutSession(
+        user_id=user_id,
+        exercise_type=exercise_type,
+        form_score=float(result.get('form_score', 0) or 0),
+        reps=int(result.get('reps', 0) or 0),
+        duration_seconds=int(float(result.get('duration_seconds', 0) or 0)),
+        form_quality=float(movement.get('form_quality', 0) or 0) * 10,
+        depth_quality=float(movement.get('depth_quality', 0) or 0) * 10,
+        consistency=round((form_consistency + depth_consistency) / 2, 1),
+        feedback=result.get('feedback') or result.get('recommendations') or [],
+        video_path=result.get('video_url'),
+    )
+    db.session.add(session)
+    db.session.commit()
+
+
+def _run_local_muscle_analysis(video_path: Path, exercise_type: str) -> dict:
+    from services.muscle_ai_service.core.analysis import analyze_saved_video
+
+    result = analyze_saved_video(video_path, exercise_type)
+    result['video_url'] = _absolute_url(result.get('video_url'))
+    return result
+
+
 def _get_user_by_id(user_id):
     return db.session.get(User, user_id)
 
@@ -583,24 +623,38 @@ def _register_api_services(app):
         file.save(str(save_path))
 
         try:
-            from gateway.tasks import analyze_video
-            task = analyze_video.delay(str(save_path), exercise_type)
-            return jsonify({'task_id': task.id, 'status': 'processing'})
-        except Exception:
+            result = _run_local_muscle_analysis(save_path, exercise_type)
+            if save_path.exists():
+                save_path.unlink()
+            _save_workout_session(g.current_user_id, exercise_type, result)
+            return jsonify(result)
+        except Exception as local_error:
+            app.logger.warning(f'Local muscle analysis failed, falling back to service: {local_error}')
             _, muscle_url = _service_urls()
             try:
                 with open(save_path, 'rb') as f:
                     resp = http_requests.post(
-                        f"{muscle_url}/muscle/upload",
+                        f"{muscle_url}/muscle/api/analyze",
                         files={'video': (save_name, f, 'video/mp4')},
                         data={'exercise_type': exercise_type},
-                        timeout=120,
+                        timeout=300,
                     )
-                if save_path.exists():
-                    save_path.unlink()
-                return Response(resp.content, status=resp.status_code, content_type=resp.headers.get('content-type', 'application/json'))
+                if not resp.ok:
+                    body = resp.json() if resp.headers.get('content-type', '').startswith('application/json') else {'error': resp.text}
+                    return jsonify(body), resp.status_code
+                result = resp.json()
+                result['video_url'] = (
+                    f"{muscle_url.rstrip('/')}{result['video_url']}"
+                    if result.get('video_url')
+                    else None
+                )
+                _save_workout_session(g.current_user_id, exercise_type, result)
+                return jsonify(result)
             except Exception as e:
                 return jsonify({'error': str(e)}), 503
+            finally:
+                if save_path.exists():
+                    save_path.unlink()
 
     @app.route('/api/v1/muscle-ai/task/<task_id>', methods=['GET'])
     def api_muscle_task(task_id):
@@ -612,7 +666,12 @@ def _register_api_services(app):
             if result.state == 'STARTED':
                 return jsonify({'task_id': task_id, 'status': 'processing'})
             if result.state == 'SUCCESS':
-                return jsonify({'task_id': task_id, 'status': 'completed', 'result': result.result})
+                payload = result.result
+                if isinstance(payload, dict):
+                    inner = payload.get('result')
+                    if isinstance(inner, dict) and str(inner.get('video_url', '')).startswith('/'):
+                        inner['video_url'] = _absolute_url(inner['video_url'])
+                return jsonify({'task_id': task_id, 'status': 'completed', 'result': payload})
             return jsonify({'task_id': task_id, 'status': result.state.lower()})
         except Exception:
             return jsonify({'error': 'Task backend unavailable, use sync upload'}), 503

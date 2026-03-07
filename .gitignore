@@ -41,6 +41,10 @@ data/ml-models/
 *.pkl
 *.npy
 *.idx
+model/*
+!model/models/
+!model/models/*.pt
+model/muscle_ai/
 
 # ===========================
 # Runtime data

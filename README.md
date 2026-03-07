@@ -243,6 +243,43 @@ Notes:
 
 ---
 
+## GitHub Actions CI/CD
+
+This repo now includes:
+
+- [`ci.yml`](.github/workflows/ci.yml) for frontend build, gateway smoke tests, and workout model loading
+- [`cd.yml`](.github/workflows/cd.yml) for production deployment from `main`
+
+### Required GitHub Secrets
+
+For the Vercel deployment job:
+
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+
+For the Hugging Face Space deployment job:
+
+- `HF_TOKEN`
+- `HF_SPACE_REPO`
+
+Example `HF_SPACE_REPO` value:
+
+```text
+your-hf-username/fitlife-ai-api
+```
+
+### How the pipeline works
+
+- Pull requests and pushes run `CI`
+- A successful `CI` run on `main` triggers `CD`
+- `CD` deploys the frontend to Vercel
+- `CD` syncs a Space-ready backend bundle to your Hugging Face Space repo
+
+If you use the GitHub Actions Vercel deploy, disable duplicate auto-deploy behavior in Vercel if you do not want both Git integration and Actions creating separate production deployments.
+
+---
+
 ## Resume Positioning
 
 Use [`docs/RESUME_PROJECT.md`](docs/RESUME_PROJECT.md) for resume bullets, a portfolio summary, and interview talking points.

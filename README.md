@@ -15,13 +15,16 @@
 
 ## Overview
 
-FitLife is a resume-ready full-stack wellness product with three demoable surfaces:
+FitLife is a full-stack fitness product with three core surfaces:
 
-- **Fuel Scan** - Photograph any nutrition label and get a fit score, nutrient breakdown, and profile-aware recommendations using OCR + AI scoring.
-- **Form Coach** - Upload a workout video and receive movement feedback, rep counting, and coaching cues powered by pose estimation.
-- **FitLife Coach** - A RAG-based nutrition assistant for meal ideas, ingredient swaps, and recovery guidance.
+- **Fuel Scan** - upload a nutrition label photo and get extracted nutrition data, scoring, and profile-aware recommendations.
+- **Form Coach** - upload a workout clip and receive rep counting, movement scoring, and coaching cues powered by YOLO pose checkpoints.
+- **FitLife Coach** - ask nutrition and recovery questions through a profile-aware AI assistant.
 
-The goal of this version is to present the project as a polished portfolio app: stronger branding, clearer product positioning, and frontend flows that feel intentionally designed for walkthroughs and interviews.
+This repo is set up to deploy with:
+
+- `Vercel` for the Next.js frontend
+- `Hugging Face Spaces (Docker)` for the Flask backend
 
 ---
 
@@ -31,40 +34,29 @@ The goal of this version is to present the project as a polished portfolio app: 
 |---|---|
 | Frontend | Next.js 15, React 19, Tailwind CSS 4, TypeScript |
 | Backend API | Flask, SQLAlchemy, PyJWT, Flask-Login |
-| AI / ML | YOLOv8, EasyOCR, Groq (Llama 3), RAG retrieval |
-| Async Tasks | Celery + Redis |
+| AI / ML | YOLOv8 pose, Groq vision/text models, RAG retrieval |
+| Async Tasks | Celery + Redis (optional) |
 | Database | SQLite (dev), PostgreSQL-ready |
-| Deployment | Vercel (frontend) + Koyeb (backend), Render optional |
+| Deployment | Vercel (frontend) + Hugging Face Spaces (backend) |
 
 ---
 
 ## Project Structure
 
-```
+```text
 fitlife/
-├── frontend/                # Next.js frontend (port 3000)
-│   ├── src/app/             # 20 page routes
-│   ├── src/components/      # Reusable UI components
-│   ├── src/lib/             # API client, auth context, types
-│   └── src/hooks/           # Custom React hooks
-│
-├── gateway/                 # Flask API Gateway (port 5000)
-│   ├── app.py               # Main app with JSON API + legacy routes
-│   ├── auth_jwt.py          # JWT authentication
-│   ├── celery_app.py        # Async task config
-│   └── tasks.py             # Celery tasks
-│
-├── services/
-│   ├── nutri_ai_service/    # Nutrition scanning (port 5001)
-│   │   └── core/ana/        # Ana RAG chatbot agent
-│   ├── muscle_ai_service/   # Workout analysis (port 5002)
-│   └── shared/database/     # SQLAlchemy models
-│
-├── data/
-│   ├── nutri-ai/            # RAG knowledge base (book_chunks, diseases, nutrient_limits)
-│   └── ml-models/yolo/      # YOLO model weights (not in repo, see setup)
-│
-└── web/                     # Legacy Jinja2 templates (kept for compatibility)
+|-- frontend/                # Next.js frontend
+|-- gateway/                 # Flask API gateway
+|-- services/
+|   |-- muscle_ai_service/   # Workout analysis service
+|   |-- nutri_ai_service/    # Nutrition / RAG service
+|   `-- shared/database/     # Shared SQLAlchemy models
+|-- data/
+|   `-- nutri-ai/            # Knowledge base JSON files
+|-- model/
+|   `-- models/              # Tracked YOLO workout checkpoints
+|-- docs/                    # Resume + deployment docs
+`-- web/                     # Legacy Jinja templates / static output
 ```
 
 ---
@@ -75,9 +67,9 @@ fitlife/
 
 - Python 3.11+
 - Node.js 18+
-- (Optional) Redis for async Form Coach processing
+- Groq API key for nutrition OCR / chat features
 
-### 1. Clone and set up
+### 1. Clone the repo
 
 ```bash
 git clone https://github.com/shinzoxD/FitLife-AI.git
@@ -91,49 +83,87 @@ python -m venv .venv
 
 # Windows
 .\.venv\Scripts\Activate.ps1
+
 # macOS / Linux
 source .venv/bin/activate
 
 pip install -r requirements.txt
-
-cp env.example .env
-# Edit .env and add your GROQ_API_KEY (free at https://console.groq.com)
+copy env.example .env
 ```
+
+Edit `.env` and set at least:
+
+- `SECRET_KEY`
+- `JWT_SECRET_KEY`
+- `GROQ_API_KEY`
 
 ### 3. Frontend setup
 
 ```bash
 cd frontend
 npm install
-cp .env.example .env.local
+copy .env.example .env.local
 cd ..
 ```
 
-Set `NEXT_PUBLIC_API_URL=http://localhost:5000` in `frontend/.env.local` so the Next.js app talks to the Flask gateway during local development.
+Set this in `frontend/.env.local`:
 
-### 4. Download YOLO models (for Form Coach)
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
 
-Place the YOLO `.pt` model files in `data/ml-models/yolo/`. These are not included in the repo due to size. Contact the maintainers or train your own models.
-
-### 5. Run
+### 4. Run locally
 
 Open two terminals:
 
 ```bash
-# Terminal 1: Backend (port 5000)
+# Terminal 1
 python gateway/app.py
 
-# Terminal 2: Frontend (port 3000)
+# Terminal 2
 cd frontend && npm run dev
 ```
 
-Open **http://localhost:3000** in your browser.
+Open [http://localhost:3000](http://localhost:3000).
+
+---
+
+## Workout Models
+
+The workout checkpoints are tracked in:
+
+- `model/models`
+
+Current checkpoints:
+
+- `best.pt`
+- `sumo_best.pt`
+- `squats_best.pt`
+- `best_romanian.pt`
+- `zercher_best.pt`
+- `front_squats_best.pt`
+
+The workout service auto-resolves these from:
+
+- `services/muscle_ai_service/config/settings.py`
+
+To inspect embedded validation metrics:
+
+```bash
+G:\fitlife\.venv\Scripts\python.exe scripts\evaluate_muscle_models.py
+```
+
+To run a fresh validation pass once you have the dataset YAML:
+
+```bash
+G:\fitlife\.venv\Scripts\python.exe scripts\evaluate_muscle_models.py --data path\to\config.yaml
+```
 
 ---
 
 ## API Endpoints
 
-All API routes are prefixed with `/api/v1/`:
+All API routes are prefixed with `/api/v1/`.
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
@@ -142,11 +172,11 @@ All API routes are prefixed with `/api/v1/`:
 | POST | `/auth/refresh` | - | Refresh access token |
 | GET | `/user` | JWT | Get user profile |
 | PUT | `/user/settings` | JWT | Update profile |
-| GET | `/user/scans` | JWT | Scan history (paginated) |
-| GET | `/user/workouts` | JWT | Workout history (paginated) |
+| GET | `/user/scans` | JWT | Scan history |
+| GET | `/user/workouts` | JWT | Workout history |
 | GET | `/dashboard/stats` | JWT | Dashboard statistics |
 | POST | `/nutri-ai/upload` | Optional | Upload nutrition label |
-| POST | `/nutri-ai/analyze` | Optional | Analyze nutrition data |
+| POST | `/nutri-ai/analyze` | Optional | Analyze extracted nutrition data |
 | POST | `/muscle-ai/upload` | Optional | Upload workout video |
 | GET | `/muscle-ai/task/:id` | - | Poll async task status |
 | POST | `/ana/chat` | Optional | Chat with FitLife Coach |
@@ -155,69 +185,75 @@ All API routes are prefixed with `/api/v1/`:
 
 ## Environment Variables
 
-See `env.example` for all configuration options. The only required variable for basic functionality is:
+Use [`env.example`](env.example) as the base. The important ones are:
 
 | Variable | Required | Description |
 |---|---|---|
-| `GROQ_API_KEY` | For FitLife Coach | Free API key from [console.groq.com](https://console.groq.com) |
 | `SECRET_KEY` | Yes | Flask session secret |
 | `JWT_SECRET_KEY` | Yes | JWT signing secret |
+| `GROQ_API_KEY` | For nutrition/chat | Groq API key |
+| `FRONTEND_URL` | In production | Public Vercel frontend URL |
+| `NEXT_PUBLIC_API_URL` | Frontend | Public backend URL |
 
 ---
 
 ## Deployment
 
-### Free Path: Vercel + Koyeb
+### Recommended Path: Vercel + Hugging Face Space
 
-This repo is set up for a free split deployment:
+#### 1. Deploy the backend on Hugging Face Spaces
 
-- `Vercel` hosts the Next.js frontend from `frontend/`
-- `Koyeb` hosts the Flask gateway from the repo root using the included `Dockerfile`
+Use a **Docker Space** and point it at this repo.
 
-#### 1. Deploy the frontend on Vercel
+The root [`Dockerfile`](Dockerfile) is now prepared for Spaces:
+
+- installs the full backend + workout-model dependencies
+- copies the tracked YOLO checkpoints from `model/models`
+- serves the Flask gateway on port `7860`
+
+Space variables to set:
+
+- `SECRET_KEY`
+- `JWT_SECRET_KEY`
+- `GROQ_API_KEY`
+- `FRONTEND_URL=https://your-vercel-app.vercel.app`
+- `GOOGLE_CLIENT_ID` (optional)
+- `GOOGLE_CLIENT_SECRET` (optional)
+
+Use the template in [`docs/HUGGINGFACE_SPACE_README.md`](docs/HUGGINGFACE_SPACE_README.md) for the Space repo `README.md` metadata.
+
+#### 2. Deploy the frontend on Vercel
 
 - Import the GitHub repo into Vercel
-- Keep the existing root directory from `vercel.json`:
+- Keep the existing root directory from [`vercel.json`](vercel.json):
   - `frontend`
 - Set:
-  - `NEXT_PUBLIC_API_URL=https://your-koyeb-backend.koyeb.app`
+  - `NEXT_PUBLIC_API_URL=https://your-space-name.hf.space`
 
-#### 2. Deploy the backend on Koyeb
+#### 3. Final wiring
 
-- Create a new Web Service from the same GitHub repo
-- Deploy from the repo root so Koyeb uses the included `Dockerfile`
-- Set these environment variables:
-  - `SECRET_KEY`
-  - `JWT_SECRET_KEY`
-  - `GROQ_API_KEY`
-  - `FRONTEND_URL=https://your-vercel-app.vercel.app`
-  - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` if you want Google auth
-
-#### 3. Redeploy both once
-
-- After Koyeb gives you the backend URL, update `NEXT_PUBLIC_API_URL` in Vercel
-- After Vercel gives you the frontend URL, update `FRONTEND_URL` in Koyeb
-- Redeploy both services once so CORS and frontend API calls point to the final domains
+- After Vercel gives you the frontend URL, set `FRONTEND_URL` in the Hugging Face Space to that exact URL
+- Redeploy the Space once after updating `FRONTEND_URL`
 
 Notes:
 
-- The backend container uses `requirements-render.txt` as the lightweight deployment dependency set for the API gateway.
-- The default SQLite database is fine for a portfolio deploy, but PostgreSQL is the better production choice.
-- If you want async Form Coach jobs in production, add Redis and Celery worker infrastructure.
-- `render.yaml` is still included if you prefer Render later.
+- Hugging Face free Spaces can sleep when idle
+- The backend is public at the `.hf.space` URL, which is required for the Vercel frontend to call it directly
+- For a portfolio demo, the default SQLite database is acceptable
+
+---
 
 ## Resume Positioning
 
-Use [docs/RESUME_PROJECT.md](docs/RESUME_PROJECT.md) for resume bullets, a portfolio summary, and interview talking points for FitLife.
+Use [`docs/RESUME_PROJECT.md`](docs/RESUME_PROJECT.md) for resume bullets, a portfolio summary, and interview talking points.
 
 ---
 
 ## Acknowledgments
 
-- Harvard Medical School nutrition research (RAG knowledge base)
 - Ultralytics YOLOv8 for pose estimation
-- Groq for fast LLM inference
-- EasyOCR for text extraction
+- Groq for nutrition OCR and text inference
+- Harvard Medical School nutrition research used in the knowledge base
 
 ---
 

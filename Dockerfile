@@ -2,20 +2,25 @@ FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PORT=8000
+    PORT=7860
 
 WORKDIR /app
 
-COPY requirements-render.txt ./
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements-space.txt ./
 
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements-render.txt
+    && pip install --no-cache-dir -r requirements-space.txt
 
 COPY gateway ./gateway
 COPY services ./services
 COPY web ./web
 COPY data/nutri-ai ./data/nutri-ai
+COPY model/models ./model/models
 
-EXPOSE 8000
+EXPOSE 7860
 
-CMD ["sh", "-c", "gunicorn gateway.app:app --bind 0.0.0.0:${PORT:-8000} --workers 1 --timeout 120"]
+CMD ["sh", "-c", "gunicorn gateway.app:app --bind 0.0.0.0:${PORT:-7860} --workers 1 --timeout 300"]

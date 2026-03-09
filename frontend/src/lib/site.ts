@@ -11,7 +11,6 @@ export const navLinks = [
   { href: '/muscle-ai', label: 'Form Coach' },
   { href: '/ana', label: 'FitLife Coach' },
   { href: '/pricing', label: 'Plans' },
-  { href: '/developers', label: 'Architecture' },
 ];
 
 export const products = [

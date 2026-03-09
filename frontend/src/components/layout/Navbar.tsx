@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import MobileMenu from './MobileMenu';
+import ThemeToggle from './ThemeToggle';
 import { navLinks, site } from '@/lib/site';
 
 export default function Navbar() {
@@ -28,6 +29,7 @@ export default function Navbar() {
         </ul>
 
         <div className="hidden items-center gap-3 md:flex">
+          <ThemeToggle compact />
           {user ? (
             <>
               <Link

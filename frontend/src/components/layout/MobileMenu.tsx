@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import type { User } from '@/lib/types';
 import { site } from '@/lib/site';
+import ThemeToggle from './ThemeToggle';
 
 interface Props {
   open: boolean;
@@ -67,6 +68,7 @@ export default function MobileMenu({ open, onClose, links, user, onLogout }: Pro
         </nav>
 
         <div className="space-y-3 border-t border-border p-6">
+          <ThemeToggle />
           {user ? (
             <>
               <Link

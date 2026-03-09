@@ -36,7 +36,7 @@ export default function HomePage() {
   return (
     <>
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(23,127,132,0.12),transparent_60%)]" />
+        <div className="fitlife-hero-glow absolute inset-0" />
         <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-24">
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-flex rounded-full border border-accent/30 bg-accent-glow px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-accent">
@@ -144,7 +144,7 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-24">
-        <div className="rounded-[2rem] border border-border bg-[linear-gradient(135deg,rgba(255,249,240,0.94),rgba(239,227,209,0.88))] p-10 shadow-sm shadow-black/5 lg:p-14">
+        <div className="fitlife-panel-gradient rounded-[2rem] border border-border p-10 shadow-sm shadow-black/5 lg:p-14">
           <div className="grid gap-10 lg:grid-cols-[1.35fr_0.85fr]">
             <div>
               <h2 className="font-display text-3xl font-bold">Why this works well as a portfolio build</h2>

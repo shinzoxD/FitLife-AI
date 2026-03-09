@@ -17,6 +17,15 @@
   --color-warning: #b7791f;
   --color-info: #177f84;
 
+  --surface-body-start: #fffaf2;
+  --surface-body-end: #f5ecdf;
+  --surface-top-left: rgba(23, 127, 132, 0.16);
+  --surface-top-right: rgba(230, 107, 44, 0.16);
+  --surface-hero-glow: rgba(23, 127, 132, 0.12);
+  --surface-accent-glow: rgba(230, 107, 44, 0.12);
+  --surface-panel-start: rgba(255, 249, 240, 0.94);
+  --surface-panel-end: rgba(239, 227, 209, 0.88);
+
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", "Manrope", ui-sans-serif, system-ui, sans-serif;
 }
@@ -25,20 +34,63 @@ html {
   scroll-behavior: smooth;
 }
 
+html[data-theme='dark'] {
+  --color-bg-primary: #0f1719;
+  --color-bg-secondary: #162125;
+  --color-bg-tertiary: #213136;
+  --color-bg-elevated: #1b2a2e;
+  --color-border: #33464c;
+  --color-border-hover: #4b6269;
+  --color-text-primary: #eef0e7;
+  --color-text-secondary: #bcc7c9;
+  --color-text-tertiary: #8a9ca0;
+  --color-accent: #ff8b4a;
+  --color-accent-hover: #ff7430;
+  --color-accent-glow: rgba(255, 139, 74, 0.16);
+  --color-error: #f87171;
+  --color-warning: #f3b85a;
+  --color-info: #4db5b8;
+
+  --surface-body-start: #131b1f;
+  --surface-body-end: #0b1114;
+  --surface-top-left: rgba(77, 181, 184, 0.14);
+  --surface-top-right: rgba(255, 139, 74, 0.16);
+  --surface-hero-glow: rgba(77, 181, 184, 0.12);
+  --surface-accent-glow: rgba(255, 139, 74, 0.14);
+  --surface-panel-start: rgba(21, 30, 34, 0.94);
+  --surface-panel-end: rgba(16, 24, 28, 0.88);
+}
+
 body {
   background-color: var(--color-bg-primary);
   background-image:
-    radial-gradient(circle at top left, rgba(23, 127, 132, 0.16), transparent 30%),
-    radial-gradient(circle at top right, rgba(230, 107, 44, 0.16), transparent 28%),
-    linear-gradient(180deg, #fffaf2 0%, #f5ecdf 100%);
+    radial-gradient(circle at top left, var(--surface-top-left), transparent 30%),
+    radial-gradient(circle at top right, var(--surface-top-right), transparent 28%),
+    linear-gradient(180deg, var(--surface-body-start) 0%, var(--surface-body-end) 100%);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    background-image 180ms ease;
 }
 
 ::selection {
   background: rgba(230, 107, 44, 0.24);
+}
+
+.fitlife-hero-glow {
+  background: radial-gradient(ellipse at top, var(--surface-hero-glow), transparent 60%);
+}
+
+.fitlife-accent-glow {
+  background: radial-gradient(ellipse at top, var(--surface-accent-glow), transparent 60%);
+}
+
+.fitlife-panel-gradient {
+  background: linear-gradient(135deg, var(--surface-panel-start), var(--surface-panel-end));
 }
 
 ::-webkit-scrollbar {

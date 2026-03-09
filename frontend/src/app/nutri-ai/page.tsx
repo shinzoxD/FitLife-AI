@@ -10,7 +10,7 @@ export default function NutriAIPage() {
   return (
     <>
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(230,107,44,0.12),transparent_60%)]" />
+        <div className="fitlife-accent-glow absolute inset-0" />
         <div className="relative mx-auto max-w-4xl px-6 pb-20 pt-28 text-center">
           <span className="mb-4 inline-block rounded-full border border-accent/30 bg-accent-glow px-3 py-1 text-xs font-semibold text-accent">
             FUEL SCAN

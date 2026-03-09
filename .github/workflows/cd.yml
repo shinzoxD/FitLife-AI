@@ -102,6 +102,20 @@ jobs:
             ./ hf-space/
           cp docs/HUGGINGFACE_SPACE_README.md hf-space/README.md
 
+      - name: Setup Git LFS for Space assets
+        if: steps.hf-secrets.outputs.ready == 'true'
+        run: |
+          cd hf-space
+          git lfs install
+          git lfs track "*.pt"
+          git lfs track "*.png"
+          git lfs track "*.gif"
+          git lfs track "*.jpg"
+          git lfs track "*.jpeg"
+          git lfs track "*.webp"
+          git lfs track "*.svg"
+          git lfs track "*.mp4"
+
       - name: Push to Hugging Face Space
         if: steps.hf-secrets.outputs.ready == 'true'
         run: |

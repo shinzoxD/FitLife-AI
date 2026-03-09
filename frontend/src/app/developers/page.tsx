@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { stackHighlights } from '@/lib/site';
 
 const endpoints = [
@@ -85,11 +84,6 @@ export default function DevelopersPage() {
         </div>
       </section>
 
-      <div className="mt-12 text-center">
-        <Link href="/register" className="rounded-lg bg-accent px-6 py-3 text-sm font-medium text-white shadow-md shadow-accent/20 hover:bg-accent-hover">
-          Try the Demo App
-        </Link>
-      </div>
     </div>
   );
 }

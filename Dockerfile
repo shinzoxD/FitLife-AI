@@ -18,7 +18,6 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 COPY gateway ./gateway
 COPY services ./services
-COPY web ./web
 COPY data/nutri-ai ./data/nutri-ai
 COPY model/models ./model/models
 

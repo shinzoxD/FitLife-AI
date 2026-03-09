@@ -93,13 +93,14 @@ jobs:
         if: steps.hf-secrets.outputs.ready == 'true'
         run: |
           mkdir -p hf-space
-          rsync -av --delete \
-            --exclude ".git" \
-            --exclude ".github" \
-            --exclude ".venv" \
-            --exclude "frontend/node_modules" \
-            --exclude "frontend/.next" \
-            ./ hf-space/
+          cp Dockerfile hf-space/Dockerfile
+          cp requirements-space.txt hf-space/requirements-space.txt
+          cp -r gateway hf-space/gateway
+          cp -r services hf-space/services
+          mkdir -p hf-space/data
+          cp -r data/nutri-ai hf-space/data/nutri-ai
+          mkdir -p hf-space/model
+          cp -r model/models hf-space/model/models
           cp docs/HUGGINGFACE_SPACE_README.md hf-space/README.md
 
       - name: Setup Git LFS for Space assets
@@ -108,13 +109,6 @@ jobs:
           cd hf-space
           git lfs install
           git lfs track "*.pt"
-          git lfs track "*.png"
-          git lfs track "*.gif"
-          git lfs track "*.jpg"
-          git lfs track "*.jpeg"
-          git lfs track "*.webp"
-          git lfs track "*.svg"
-          git lfs track "*.mp4"
 
       - name: Push to Hugging Face Space
         if: steps.hf-secrets.outputs.ready == 'true'

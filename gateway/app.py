@@ -278,10 +278,12 @@ def _get_user_by_id(user_id):
 # ---------------------------------------------------------------------------
 
 def create_app(config_name='development'):
+    template_folder = None if _is_huggingface_runtime() else '../web/templates'
+    static_folder = None if _is_huggingface_runtime() else '../web/static'
     app = Flask(
         __name__,
-        template_folder='../web/templates',
-        static_folder='../web/static',
+        template_folder=template_folder,
+        static_folder=static_folder,
     )
 
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -864,6 +866,8 @@ def _register_api_ana(app):
 def _register_error_handlers(app):
     @app.errorhandler(404)
     def not_found(error):
+        if _is_huggingface_runtime():
+            return jsonify({'error': 'Not found'}), 404
         if request.path.startswith('/api/'):
             return jsonify({'error': 'Not found'}), 404
         return render_template('errors/404.html'), 404
@@ -871,12 +875,16 @@ def _register_error_handlers(app):
     @app.errorhandler(500)
     def internal_error(error):
         db.session.rollback()
+        if _is_huggingface_runtime():
+            return jsonify({'error': 'Internal server error'}), 500
         if request.path.startswith('/api/'):
             return jsonify({'error': 'Internal server error'}), 500
         return render_template('errors/500.html'), 500
 
     @app.errorhandler(503)
     def service_unavailable(error):
+        if _is_huggingface_runtime():
+            return jsonify({'error': 'Service unavailable'}), 503
         if request.path.startswith('/api/'):
             return jsonify({'error': 'Service unavailable'}), 503
         return render_template('errors/503.html'), 503

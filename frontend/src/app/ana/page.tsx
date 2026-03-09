@@ -57,7 +57,7 @@ export default function AnaPage() {
         </div>
         <div>
           <h1 className="font-display text-lg font-bold">FitLife Coach</h1>
-          <p className="text-xs text-text-tertiary">Meal planning and recovery assistant</p>
+          <p className="text-xs text-text-tertiary">Nutrition and recovery assistant</p>
         </div>
       </div>
 

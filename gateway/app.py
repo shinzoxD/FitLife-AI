@@ -31,7 +31,15 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from services.shared.database.models import db, User, ScanHistory, WorkoutSession, init_db
+from services.shared.database.models import (
+    db,
+    User,
+    ScanHistory,
+    WorkoutSession,
+    Achievement,
+    APIKey,
+    init_db,
+)
 from gateway.auth_jwt import generate_tokens, decode_token, jwt_required, jwt_optional
 from gateway.nutri_ai_lite import extract_nutrition_from_image, calculate_health_metrics, generate_score
 
@@ -637,6 +645,19 @@ def _register_api_user(app):
         if not user:
             return jsonify({'error': 'User not found'}), 404
         return jsonify(_user_to_full_dict(user))
+
+    @app.route('/api/v1/user', methods=['DELETE'])
+    @jwt_required
+    def api_delete_user():
+        user = _get_user_by_id(g.current_user_id)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        Achievement.query.filter_by(user_id=user.id).delete()
+        APIKey.query.filter_by(user_id=user.id).delete()
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({'status': 'deleted'})
 
     @app.route('/api/v1/user/settings', methods=['PUT'])
     @jwt_required

@@ -14,6 +14,14 @@ FitLife is a deployed full-stack AI fitness app that combines nutrition-label OC
 
 FitLife is a polished full-stack portfolio project that demonstrates frontend design, API integration, authentication, OCR, computer-vision-based workout analysis, and live cloud deployment in a single repo.
 
+## GitHub Description
+
+FitLife is a full-stack AI fitness app built with Next.js, Flask, OCR nutrition analysis, pose-based workout scoring, and live cloud deployment.
+
+## Portfolio Card Text
+
+FitLife combines nutrition-label OCR, workout-form analysis, and AI coaching into one deployed full-stack product.
+
 ## Interview Talking Points
 
 - Why the app is split between a Next.js frontend and a Flask gateway.

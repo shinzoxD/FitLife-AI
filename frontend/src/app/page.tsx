@@ -27,9 +27,9 @@ const featureProof = [
 ];
 
 const differentiators = [
-  ['Original product framing', 'Fuel Scan, Form Coach, and FitLife Coach create a distinct brand identity.'],
-  ['Portfolio-friendly narrative', 'Architecture, roadmap, and feature pages explain why the stack matters.'],
-  ['Demo-first UX', 'Flows are designed to be explored quickly during a resume or interview walkthrough.'],
+  ['Connected product surfaces', 'Fuel Scan, Form Coach, and FitLife Coach work together as one training workflow.'],
+  ['Profile-aware guidance', 'Nutrition scoring and coaching stay grounded in the user profile instead of generic tips.'],
+  ['Practical feedback loops', 'Each tool is designed to turn uploads and questions into clear next actions.'],
 ];
 
 export default function HomePage() {
@@ -147,9 +147,9 @@ export default function HomePage() {
         <div className="fitlife-panel-gradient rounded-[2rem] border border-border p-10 shadow-sm shadow-black/5 lg:p-14">
           <div className="grid gap-10 lg:grid-cols-[1.35fr_0.85fr]">
             <div>
-              <h2 className="font-display text-3xl font-bold">Why this works well as a portfolio build</h2>
+              <h2 className="font-display text-3xl font-bold">Why FitLife works as a product</h2>
               <p className="mt-4 max-w-2xl text-text-secondary">
-                FitLife combines product branding, user flows, and technical depth into a single project that is easy to demo and easy to explain.
+                FitLife brings nutrition scanning, workout analysis, and AI coaching into one system that feels coherent, measurable, and useful.
               </p>
             </div>
 

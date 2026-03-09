@@ -142,33 +142,34 @@ def process_video(video_path, output_path, web_path, exercise_type, yolo_model):
         metrics['web_video_available'] = False
 
         # Convert to web format if moviepy/ffmpeg is available. Analysis still succeeds without it.
-        try:
-            from moviepy.video.io.VideoFileClip import VideoFileClip  # type: ignore
-
-            logger.info("Converting video to web format")
-            clip = VideoFileClip(output_path)
+        if web_path:
             try:
-                if use_gpu:
-                    clip.write_videofile(
-                        web_path,
-                        codec='libx264',
-                        preset='fast',
-                        threads=4,
-                        ffmpeg_params=[
-                            '-hwaccel', 'cuda',
-                            '-hwaccel_output_format', 'cuda',
-                            '-c:v', 'h264_nvenc',
-                            '-preset', 'p4',
-                            '-tune', 'zerolatency',
-                        ],
-                    )
-                else:
-                    clip.write_videofile(web_path, codec='libx264')
-                metrics['web_video_available'] = True
-            finally:
-                clip.close()
-        except Exception as conversion_error:
-            logger.warning(f"Skipping web video conversion: {conversion_error}")
+                from moviepy.video.io.VideoFileClip import VideoFileClip  # type: ignore
+
+                logger.info("Converting video to web format")
+                clip = VideoFileClip(output_path)
+                try:
+                    if use_gpu:
+                        clip.write_videofile(
+                            web_path,
+                            codec='libx264',
+                            preset='fast',
+                            threads=4,
+                            ffmpeg_params=[
+                                '-hwaccel', 'cuda',
+                                '-hwaccel_output_format', 'cuda',
+                                '-c:v', 'h264_nvenc',
+                                '-preset', 'p4',
+                                '-tune', 'zerolatency',
+                            ],
+                        )
+                    else:
+                        clip.write_videofile(web_path, codec='libx264')
+                    metrics['web_video_available'] = True
+                finally:
+                    clip.close()
+            except Exception as conversion_error:
+                logger.warning(f"Skipping web video conversion: {conversion_error}")
 
         return metrics
 

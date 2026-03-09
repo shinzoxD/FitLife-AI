@@ -43,7 +43,14 @@ HOP_BY_HOP_HEADERS = {
     'te', 'trailers', 'transfer-encoding', 'upgrade',
 }
 
-UPLOAD_FOLDER = PROJECT_ROOT / 'data' / 'uploads'
+
+def _runtime_data_root() -> Path:
+    if os.environ.get('SPACE_ID'):
+        return Path('/tmp/fitlife')
+    return PROJECT_ROOT / 'data'
+
+
+UPLOAD_FOLDER = _runtime_data_root() / 'uploads'
 
 
 def _service_urls():
@@ -747,10 +754,10 @@ def _register_error_handlers(app):
 
 def _ensure_directories():
     for d in [
-        PROJECT_ROOT / 'data',
-        PROJECT_ROOT / 'data' / 'uploads',
-        PROJECT_ROOT / 'data' / 'uploads' / 'videos',
-        PROJECT_ROOT / 'data' / 'processed',
+        _runtime_data_root(),
+        _runtime_data_root() / 'uploads',
+        _runtime_data_root() / 'uploads' / 'videos',
+        _runtime_data_root() / 'processed',
         PROJECT_ROOT / 'logs',
     ]:
         d.mkdir(parents=True, exist_ok=True)

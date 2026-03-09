@@ -5,6 +5,7 @@ Shared workout-analysis helpers used by the gateway and the standalone service.
 from __future__ import annotations
 
 import logging
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -16,8 +17,14 @@ from .models.yolo import get_yolo_models
 logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-PROCESSED_DIR = PROJECT_ROOT / 'data' / 'processed' / 'videos'
-STATIC_VIDEO_DIR = PROJECT_ROOT / 'web' / 'static' / 'videos'
+
+
+def _is_huggingface_space() -> bool:
+    return bool(os.environ.get('SPACE_ID'))
+
+
+PROCESSED_DIR = (Path('/tmp/fitlife') if _is_huggingface_space() else PROJECT_ROOT / 'data') / 'processed' / 'videos'
+STATIC_VIDEO_DIR = (Path('/tmp/fitlife') if _is_huggingface_space() else PROJECT_ROOT / 'web' / 'static') / 'videos'
 
 
 def _exercise_label(exercise_type: str) -> str:
@@ -126,17 +133,18 @@ def analyze_saved_video(video_path: str | Path, exercise_type: str) -> dict[str,
     processed_path = PROCESSED_DIR / f'processed_{timestamp}_{stem}.mp4'
     web_filename = f'web_{timestamp}_{stem}.mp4'
     web_path = STATIC_VIDEO_DIR / web_filename
+    wants_web_video = not _is_huggingface_space()
 
     models = get_yolo_models()
     metrics = process_video(
         str(video_path),
         str(processed_path),
-        str(web_path),
+        str(web_path) if wants_web_video else None,
         exercise_type,
         models[exercise_type],
     )
 
-    video_url = f'/static/videos/{web_filename}' if web_path.exists() else None
+    video_url = f'/static/videos/{web_filename}' if wants_web_video and web_path.exists() else None
 
     if processed_path.exists():
         processed_path.unlink()

@@ -13,6 +13,7 @@ gunicorn>=21.0.0
 # Database
 SQLAlchemy>=2.0.0
 greenlet>=3.0.0
+psycopg[binary]>=3.2.0
 
 # Authentication & Validation
 email-validator>=2.0.0

@@ -43,7 +43,7 @@ This repo is deployed with:
 | Backend API | Flask, SQLAlchemy, PyJWT, Flask-Login |
 | AI / ML | YOLOv8 pose, Groq vision/text models, RAG retrieval |
 | Async Tasks | Celery + Redis (optional) |
-| Database | SQLite (dev), PostgreSQL-ready |
+| Database | SQLite (dev), PostgreSQL / Neon (prod) |
 | Deployment | Vercel (frontend) + Hugging Face Spaces (backend) |
 
 ---
@@ -103,6 +103,7 @@ Edit `.env` and set at least:
 - `SECRET_KEY`
 - `JWT_SECRET_KEY`
 - `GROQ_API_KEY`
+- `DATABASE_URL` for PostgreSQL in production
 
 ### 3. Frontend setup
 
@@ -198,6 +199,7 @@ Use [`env.example`](env.example) as the base. The important ones are:
 |---|---|---|
 | `SECRET_KEY` | Yes | Flask session secret |
 | `JWT_SECRET_KEY` | Yes | JWT signing secret |
+| `DATABASE_URL` | Production | PostgreSQL connection string (Neon works well) |
 | `GROQ_API_KEY` | For nutrition/chat | Groq API key |
 | `FRONTEND_URL` | In production | Public Vercel frontend URL |
 | `NEXT_PUBLIC_API_URL` | Frontend | Public backend URL |
@@ -222,6 +224,7 @@ Space variables to set:
 
 - `SECRET_KEY`
 - `JWT_SECRET_KEY`
+- `DATABASE_URL=postgresql://...`
 - `GROQ_API_KEY`
 - `FRONTEND_URL=https://your-vercel-app.vercel.app`
 - `GOOGLE_CLIENT_ID` (optional)
@@ -246,7 +249,7 @@ Notes:
 
 - Hugging Face free Spaces can sleep when idle
 - The backend is public at the `.hf.space` URL, which is required for the Vercel frontend to call it directly
-- For a portfolio demo, the default SQLite database is acceptable
+- For durable user accounts and settings, use PostgreSQL instead of the default SQLite fallback
 
 ---
 

@@ -57,6 +57,11 @@ def _frontend_url() -> str:
     return os.environ.get('FRONTEND_URL', 'http://localhost:3000').rstrip('/')
 
 
+def _is_huggingface_space_request() -> bool:
+    host = request.host.lower() if request else ''
+    return host.endswith('.hf.space') or bool(os.environ.get('SPACE_ID'))
+
+
 def _proxy_request(target_url: str) -> Response:
     headers = {
         k: v for k, v in request.headers.items()
@@ -195,6 +200,14 @@ def create_app(config_name='development'):
 def _register_legacy_routes(app):
     @app.route('/')
     def index():
+        if _is_huggingface_space_request():
+            return jsonify({
+                'status': 'ok',
+                'service': 'fitlife-gateway',
+                'frontend_url': _frontend_url(),
+                'health': '/health',
+                'api_health': '/api/v1/health',
+            }), 200
         return redirect(f"{_frontend_url()}/")
 
     @app.route('/health')
@@ -746,4 +759,8 @@ def _ensure_directories():
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=os.environ.get('FLASK_DEBUG') == '1')
+    app.run(
+        host='0.0.0.0',
+        port=int(os.environ.get('PORT', '5000')),
+        debug=os.environ.get('FLASK_DEBUG') == '1',
+    )

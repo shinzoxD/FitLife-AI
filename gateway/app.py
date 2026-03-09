@@ -44,8 +44,12 @@ HOP_BY_HOP_HEADERS = {
 }
 
 
+def _is_huggingface_runtime() -> bool:
+    return os.environ.get('FITLIFE_RUNTIME') == 'huggingface'
+
+
 def _runtime_data_root() -> Path:
-    if os.environ.get('SPACE_ID'):
+    if _is_huggingface_runtime():
         return Path('/tmp/fitlife')
     return PROJECT_ROOT / 'data'
 
@@ -66,7 +70,139 @@ def _frontend_url() -> str:
 
 def _is_huggingface_space_request() -> bool:
     host = request.host.lower() if request else ''
-    return host.endswith('.hf.space') or bool(os.environ.get('SPACE_ID'))
+    return host.endswith('.hf.space') or _is_huggingface_runtime()
+
+
+def _public_origin() -> str:
+    forwarded_proto = request.headers.get('x-forwarded-proto', '').split(',')[0].strip()
+    forwarded_host = request.headers.get('x-forwarded-host', '').split(',')[0].strip()
+    host = forwarded_host or request.host
+
+    if forwarded_proto and host:
+        return f"{forwarded_proto}://{host}"
+    if host.endswith('.hf.space'):
+        return f"https://{host}"
+    return request.host_url.rstrip('/')
+
+
+def _space_root_html() -> str:
+    frontend = _frontend_url()
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FitLife AI API</title>
+  <style>
+    :root {{
+      color-scheme: light;
+      --bg: #f4efe5;
+      --panel: rgba(255,255,255,0.82);
+      --text: #18212b;
+      --muted: #5d6670;
+      --accent: #ef6f2d;
+      --border: rgba(24,33,43,0.08);
+    }}
+    body {{
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(239,111,45,0.18), transparent 34%),
+        linear-gradient(135deg, #eef5ef 0%, var(--bg) 52%, #f8e8db 100%);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }}
+    .card {{
+      width: min(760px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: 0 24px 90px rgba(24,33,43,0.1);
+      padding: 32px;
+      backdrop-filter: blur(12px);
+    }}
+    .eyebrow {{
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(239,111,45,0.1);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }}
+    h1 {{
+      margin: 16px 0 12px;
+      font-size: clamp(32px, 6vw, 52px);
+      line-height: 1.02;
+    }}
+    p {{
+      margin: 0 0 24px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.6;
+    }}
+    .links {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 26px;
+    }}
+    a {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--text);
+      border: 1px solid var(--border);
+      background: white;
+    }}
+    a.primary {{
+      background: var(--accent);
+      color: white;
+      border-color: transparent;
+    }}
+    ul {{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      display: grid;
+      gap: 8px;
+    }}
+    code {{
+      color: var(--text);
+      background: rgba(24,33,43,0.06);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <span class="eyebrow">FitLife Backend</span>
+    <h1>AI fitness API is live.</h1>
+    <p>This Hugging Face Space serves the FitLife gateway used by the public frontend for auth, nutrition OCR, workout analysis, and coach chat.</p>
+    <div class="links">
+      <a class="primary" href="{frontend}" target="_blank" rel="noreferrer">Open Frontend</a>
+      <a href="/health" target="_blank" rel="noreferrer">Health Check</a>
+      <a href="/api/v1/health" target="_blank" rel="noreferrer">API Health</a>
+    </div>
+    <ul>
+      <li>Frontend app: <code>{frontend}</code></li>
+      <li>Nutrition OCR endpoint: <code>/api/v1/nutri-ai/upload</code></li>
+      <li>Workout analysis endpoint: <code>/api/v1/muscle-ai/upload</code></li>
+      <li>Coach chat endpoint: <code>/api/v1/ana/chat</code></li>
+    </ul>
+  </main>
+</body>
+</html>"""
 
 
 def _proxy_request(target_url: str) -> Response:
@@ -98,7 +234,7 @@ def _absolute_url(path: str | None) -> str | None:
         return None
     if path.startswith('http://') or path.startswith('https://'):
         return path
-    return f"{request.host_url.rstrip('/')}{path}"
+    return f"{_public_origin()}{path}"
 
 
 def _save_workout_session(user_id: int | None, exercise_type: str, result: dict) -> None:
@@ -208,13 +344,7 @@ def _register_legacy_routes(app):
     @app.route('/')
     def index():
         if _is_huggingface_space_request():
-            return jsonify({
-                'status': 'ok',
-                'service': 'fitlife-gateway',
-                'frontend_url': _frontend_url(),
-                'health': '/health',
-                'api_health': '/api/v1/health',
-            }), 200
+            return Response(_space_root_html(), mimetype='text/html')
         return redirect(f"{_frontend_url()}/")
 
     @app.route('/health')

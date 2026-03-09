@@ -20,7 +20,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
 def _is_huggingface_space() -> bool:
-    return bool(os.environ.get('SPACE_ID'))
+    return os.environ.get('FITLIFE_RUNTIME') == 'huggingface'
 
 
 PROCESSED_DIR = (Path('/tmp/fitlife') if _is_huggingface_space() else PROJECT_ROOT / 'data') / 'processed' / 'videos'

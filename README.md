@@ -13,6 +13,13 @@
 
 ---
 
+## Live Demo
+
+- Frontend: `https://fit-life-ai-1eqx.vercel.app`
+- Backend API: `https://shinzobolte-fitlife-ai.hf.space`
+
+---
+
 ## Overview
 
 FitLife is a full-stack fitness product with three core surfaces:
@@ -21,7 +28,7 @@ FitLife is a full-stack fitness product with three core surfaces:
 - **Form Coach** - upload a workout clip and receive rep counting, movement scoring, and coaching cues powered by YOLO pose checkpoints.
 - **FitLife Coach** - ask nutrition and recovery questions through a profile-aware AI assistant.
 
-This repo is set up to deploy with:
+This repo is deployed with:
 
 - `Vercel` for the Next.js frontend
 - `Hugging Face Spaces (Docker)` for the Flask backend
@@ -199,7 +206,7 @@ Use [`env.example`](env.example) as the base. The important ones are:
 
 ## Deployment
 
-### Recommended Path: Vercel + Hugging Face Space
+### Current Deployment: Vercel + Hugging Face Space
 
 #### 1. Deploy the backend on Hugging Face Spaces
 
@@ -228,7 +235,7 @@ Use the template in [`docs/HUGGINGFACE_SPACE_README.md`](docs/HUGGINGFACE_SPACE_
 - Keep the existing root directory from [`vercel.json`](vercel.json):
   - `frontend`
 - Set:
-  - `NEXT_PUBLIC_API_URL=https://your-space-name.hf.space`
+  - `NEXT_PUBLIC_API_URL=https://shinzobolte-fitlife-ai.hf.space`
 
 #### 3. Final wiring
 
@@ -266,7 +273,7 @@ For the Hugging Face Space deployment job:
 Example `HF_SPACE_REPO` value:
 
 ```text
-your-hf-username/fitlife-ai-api
+shinzobolte/fitlife-ai
 ```
 
 ### How the pipeline works

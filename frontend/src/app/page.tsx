@@ -40,7 +40,7 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-24">
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-flex rounded-full border border-accent/30 bg-accent-glow px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-accent">
-              Resume-ready full-stack build
+              FitLife AI
             </span>
             <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
               Labels, lifts, and meals.

@@ -89,7 +89,7 @@ export default function UploadDropzone() {
         }}
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
-        className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 transition-colors ${
+        className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-colors sm:p-12 ${
           dragging ? 'border-accent bg-accent-glow' : 'border-border hover:border-border-hover'
         }`}
       >
@@ -103,7 +103,7 @@ export default function UploadDropzone() {
 
         {preview ? (
           /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={preview} alt="Preview" className="mb-4 max-h-64 rounded-lg object-contain" />
+          <img src={preview} alt="Preview" className="mb-4 max-h-64 w-full rounded-lg object-contain" />
         ) : (
           <svg className="mb-4 h-12 w-12 text-text-tertiary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M12 16V4m0 0-4 4m4-4 4 4" strokeLinecap="round" strokeLinejoin="round" />

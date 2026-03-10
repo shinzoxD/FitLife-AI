@@ -14,7 +14,8 @@ export interface NutritionProfile {
   };
 }
 
-const STORAGE_KEY = 'nutri_profile';
+const STORAGE_KEY = 'fitlife_nutri_profile';
+const LEGACY_SESSION_KEY = 'nutri_profile';
 
 const defaultProfile: NutritionProfile = {
   age: 25,
@@ -28,14 +29,7 @@ const defaultProfile: NutritionProfile = {
   medical_history: { diseases: [] },
 };
 
-export function saveNutritionProfile(profile: NutritionProfile) {
-  if (typeof window === 'undefined') return;
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-}
-
-export function getSessionNutritionProfile(): NutritionProfile | null {
-  if (typeof window === 'undefined') return null;
-  const raw = sessionStorage.getItem(STORAGE_KEY);
+function parseStoredProfile(raw: string | null): NutritionProfile | null {
   if (!raw) return null;
   try {
     return { ...defaultProfile, ...JSON.parse(raw) };
@@ -44,7 +38,49 @@ export function getSessionNutritionProfile(): NutritionProfile | null {
   }
 }
 
-export function hasSavedNutritionProfile(user: User | null | undefined) {
+function isCompleteProfile(profile: Partial<NutritionProfile> | null | undefined) {
+  return Boolean(
+    profile &&
+      profile.age !== null &&
+      profile.age !== undefined &&
+      profile.gender &&
+      profile.height_cm !== null &&
+      profile.height_cm !== undefined &&
+      profile.weight_kg !== null &&
+      profile.weight_kg !== undefined &&
+      profile.activity_level &&
+      profile.diet_type &&
+      profile.goal,
+  );
+}
+
+export function saveNutritionProfile(profile: NutritionProfile) {
+  if (typeof window === 'undefined') return null;
+  const serialized = JSON.stringify(profile);
+  localStorage.setItem(STORAGE_KEY, serialized);
+  sessionStorage.setItem(STORAGE_KEY, serialized);
+  sessionStorage.setItem(LEGACY_SESSION_KEY, serialized);
+}
+
+export function getStoredNutritionProfile(): NutritionProfile | null {
+  if (typeof window === 'undefined') return null;
+
+  const persistent = parseStoredProfile(localStorage.getItem(STORAGE_KEY));
+  if (persistent) return persistent;
+
+  const tabProfile =
+    parseStoredProfile(sessionStorage.getItem(STORAGE_KEY)) ??
+    parseStoredProfile(sessionStorage.getItem(LEGACY_SESSION_KEY));
+
+  if (tabProfile) {
+    saveNutritionProfile(tabProfile);
+    return tabProfile;
+  }
+
+  return null;
+}
+
+function hasCompleteUserProfile(user: User | null | undefined) {
   return Boolean(
     user &&
       user.age !== null &&
@@ -57,8 +93,15 @@ export function hasSavedNutritionProfile(user: User | null | undefined) {
   );
 }
 
+export function hasSavedNutritionProfile(
+  user: User | null | undefined,
+  storedProfile: NutritionProfile | null = getStoredNutritionProfile(),
+) {
+  return hasCompleteUserProfile(user) || isCompleteProfile(storedProfile);
+}
+
 export function buildNutritionProfileFromUser(user: User | null | undefined): NutritionProfile | null {
-  if (!hasSavedNutritionProfile(user) || !user) return null;
+  if (!hasCompleteUserProfile(user) || !user) return null;
   return {
     age: user.age ?? defaultProfile.age,
     gender: user.gender ?? defaultProfile.gender,
@@ -73,5 +116,5 @@ export function buildNutritionProfileFromUser(user: User | null | undefined): Nu
 }
 
 export function getPreferredNutritionProfile(user: User | null | undefined): NutritionProfile {
-  return buildNutritionProfileFromUser(user) ?? getSessionNutritionProfile() ?? defaultProfile;
+  return buildNutritionProfileFromUser(user) ?? getStoredNutritionProfile() ?? defaultProfile;
 }

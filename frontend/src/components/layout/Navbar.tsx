@@ -8,7 +8,7 @@ import ThemeToggle from './ThemeToggle';
 import { navLinks, site } from '@/lib/site';
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -30,7 +30,9 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-3 md:flex">
           <ThemeToggle compact />
-          {user ? (
+          {loading ? (
+            <div className="h-10 w-36 animate-pulse rounded-lg border border-border bg-bg-secondary" />
+          ) : user ? (
             <>
               <Link
                 href="/dashboard"
@@ -75,7 +77,7 @@ export default function Navbar() {
         </button>
       </nav>
 
-      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} links={navLinks} user={user} onLogout={logout} />
+      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} links={navLinks} user={user} loading={loading} onLogout={logout} />
     </header>
   );
 }

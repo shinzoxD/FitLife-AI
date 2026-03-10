@@ -24,7 +24,7 @@ const productIcons = [
 const featureProof = [
   ['3 AI-powered product flows', 'Nutrition scan, form analysis, and chat coaching built behind one UX.'],
   ['JWT auth + dashboard states', 'Profile-aware recommendations, history tables, and session handling.'],
-  ['Production-style stack', 'Next.js 15 frontend, Flask gateway, OCR, YOLOv8, and retrieval chat.'],
+  ['Production-style stack', 'Next.js 15 frontend, Flask gateway, OCR, YOLOv8, and a knowledge-grounded coach.'],
 ];
 
 const heroSignals = [
@@ -61,7 +61,7 @@ export default function HomePage() {
               <HeroSlogan />
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-text-secondary">
-              FitLife packages OCR nutrition scanning, video-based form analysis, and an AI meal coach into one product experience built with Next.js, Flask, computer vision, and RAG.
+              FitLife packages OCR nutrition scanning, video-based form analysis, and an AI meal coach into one product experience built with Next.js, Flask, computer vision, and grounded nutrition guidance.
             </p>
           </div>
 

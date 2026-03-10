@@ -4,7 +4,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { apiFetch } from '@/lib/api';
-import { buildNutritionProfileFromUser, getSessionNutritionProfile, saveNutritionProfile } from '@/lib/nutri-profile';
+import { buildNutritionProfileFromUser, getStoredNutritionProfile, saveNutritionProfile } from '@/lib/nutri-profile';
 import Button from '@/components/ui/Button';
 import Alert from '@/components/ui/Alert';
 
@@ -25,7 +25,7 @@ export default function ProfileForm() {
     'w-full rounded-lg border border-border bg-bg-tertiary px-4 py-2.5 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent';
 
   useEffect(() => {
-    const storedProfile = buildNutritionProfileFromUser(user) ?? getSessionNutritionProfile();
+    const storedProfile = buildNutritionProfileFromUser(user) ?? getStoredNutritionProfile();
     if (!storedProfile) return;
     setAge(storedProfile.age.toString());
     setGender(storedProfile.gender);

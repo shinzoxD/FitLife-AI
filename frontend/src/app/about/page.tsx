@@ -12,7 +12,7 @@ const experiences = [
   },
   {
     title: 'FitLife Coach',
-    desc: 'A retrieval-backed assistant for meal ideas, substitutions, and recovery guidance.',
+    desc: 'A nutrition-aware assistant grounded in curated meal and recovery guidance.',
   },
 ];
 

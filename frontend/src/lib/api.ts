@@ -44,11 +44,16 @@ export async function apiFetch<T = unknown>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const { access } = getTokens();
+  const { access, refresh } = getTokens();
   const headers = new Headers(options.headers);
+  let authToken = access;
 
-  if (access) {
-    headers.set('Authorization', `Bearer ${access}`);
+  if (!authToken && refresh) {
+    authToken = await refreshAccessToken();
+  }
+
+  if (authToken) {
+    headers.set('Authorization', `Bearer ${authToken}`);
   }
   if (!(options.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
@@ -56,7 +61,7 @@ export async function apiFetch<T = unknown>(
 
   let res = await fetch(`${API_BASE}${path}`, { ...options, headers });
 
-  if (res.status === 401 && access) {
+  if (res.status === 401 && refresh) {
     const newToken = await refreshAccessToken();
     if (newToken) {
       headers.set('Authorization', `Bearer ${newToken}`);

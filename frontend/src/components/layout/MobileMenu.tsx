@@ -11,10 +11,11 @@ interface Props {
   onClose: () => void;
   links: { href: string; label: string }[];
   user: User | null;
+  loading?: boolean;
   onLogout: () => void;
 }
 
-export default function MobileMenu({ open, onClose, links, user, onLogout }: Props) {
+export default function MobileMenu({ open, onClose, links, user, loading = false, onLogout }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,7 +70,9 @@ export default function MobileMenu({ open, onClose, links, user, onLogout }: Pro
 
         <div className="space-y-3 border-t border-border p-6">
           <ThemeToggle />
-          {user ? (
+          {loading ? (
+            <div className="h-12 animate-pulse rounded-lg border border-border bg-bg-tertiary" />
+          ) : user ? (
             <>
               <Link
                 href="/dashboard"

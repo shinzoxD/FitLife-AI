@@ -62,7 +62,7 @@ export default function MuscleAIPage() {
   const resultData = syncResult || taskData?.result;
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-16">
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
       <div className="mb-12 text-center">
         <span className="mb-4 inline-block rounded-full border border-accent/30 bg-accent-glow px-3 py-1 text-xs font-semibold text-accent">
           FORM COACH

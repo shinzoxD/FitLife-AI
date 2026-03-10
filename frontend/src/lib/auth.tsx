@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { apiFetch, clearTokens, getTokens, refreshAccessToken } from './api';
 import type { User, AuthResponse } from './types';
+import { buildNutritionProfileFromUser, saveNutritionProfile } from './nutri-profile';
 
 interface AuthState {
   user: User | null;
@@ -42,27 +43,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const applyUser = useCallback((nextUser: User | null) => {
+    setUser(nextUser);
+    const nutritionProfile = buildNutritionProfileFromUser(nextUser);
+    if (nutritionProfile) {
+      saveNutritionProfile(nutritionProfile);
+    }
+  }, []);
+
   const refreshUser = useCallback(async () => {
     try {
       const { access, refresh } = getTokens();
       if (!access && !refresh) {
-        setUser(null);
+        applyUser(null);
         return;
       }
       if (!access && refresh) {
         const renewed = await refreshAccessToken();
         if (!renewed) {
-          setUser(null);
+          applyUser(null);
           return;
         }
       }
       const u = await apiFetch<User>('/user');
-      setUser(u);
+      applyUser(u);
     } catch {
-      setUser(null);
+      applyUser(null);
       clearTokens();
     }
-  }, []);
+  }, [applyUser]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -75,13 +84,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refreshUser().finally(() => setLoading(false));
   }, [refreshUser]);
 
+  useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== 'access_token' && event.key !== 'refresh_token') return;
+      refreshUser().finally(() => setLoading(false));
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [refreshUser]);
+
   const login = async (email: string, password: string) => {
     const data = await apiFetch<AuthResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
     storeTokens(data.access_token, data.refresh_token);
-    setUser(data.user);
+    applyUser(data.user);
   };
 
   const register = async (name: string, email: string, password: string) => {
@@ -90,12 +109,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify({ name, email, password }),
     });
     storeTokens(data.access_token, data.refresh_token);
-    setUser(data.user);
+    applyUser(data.user);
   };
 
   const logout = () => {
     clearTokens();
-    setUser(null);
+    applyUser(null);
     window.location.href = '/';
   };
 

@@ -26,11 +26,11 @@ export default function DashboardPage() {
     apiFetch<{ items: WorkoutItem[] }>('/user/workouts?per_page=5').then((response) => setWorkouts(response.items)).catch(() => {});
   }, [user, authLoading, router]);
 
-  if (authLoading || !user) return <div className="flex min-h-[60vh] items-center justify-center text-text-secondary">Loading...</div>;
+  if (authLoading || !user) return <div className="flex min-h-[60vh] items-center justify-center px-4 text-text-secondary">Loading...</div>;
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
-      <div className="mb-8 flex items-center justify-between">
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold">Welcome back, {user.name}</h1>
           <p className="mt-1 text-text-secondary">Here is your FitLife performance snapshot.</p>
@@ -104,7 +104,7 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-2">
               {scans.map((scan) => (
-                <div key={scan.id} className="flex items-center justify-between rounded-lg border border-border bg-bg-secondary p-4">
+                <div key={scan.id} className="flex flex-col gap-3 rounded-lg border border-border bg-bg-secondary p-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-medium">{scan.product_name || 'Scan'}</p>
                     <p className="text-xs text-text-tertiary">{new Date(scan.created_at).toLocaleDateString()}</p>
@@ -130,7 +130,7 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-2">
               {workouts.map((workout) => (
-                <div key={workout.id} className="flex items-center justify-between rounded-lg border border-border bg-bg-secondary p-4">
+                <div key={workout.id} className="flex flex-col gap-3 rounded-lg border border-border bg-bg-secondary p-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-medium">{workout.exercise_type.replace(/_/g, ' ')}</p>
                     <p className="text-xs text-text-tertiary">{new Date(workout.created_at).toLocaleDateString()}</p>

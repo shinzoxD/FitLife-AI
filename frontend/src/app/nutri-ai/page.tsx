@@ -11,7 +11,7 @@ export default function NutriAIPage() {
     <>
       <section className="relative overflow-hidden">
         <div className="fitlife-accent-glow absolute inset-0" />
-        <div className="relative mx-auto max-w-4xl px-6 pb-20 pt-28 text-center">
+        <div className="relative mx-auto max-w-4xl px-4 pb-16 pt-24 text-center sm:px-6 sm:pb-20 sm:pt-28">
           <span className="mb-4 inline-block rounded-full border border-accent/30 bg-accent-glow px-3 py-1 text-xs font-semibold text-accent">
             FUEL SCAN
           </span>
@@ -27,7 +27,7 @@ export default function NutriAIPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-6 py-24">
+      <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-24">
         <div className="grid gap-8 md:grid-cols-3">
           {steps.map((step, index) => (
             <div key={step.title} className="rounded-xl border border-border bg-bg-secondary p-8 text-center">

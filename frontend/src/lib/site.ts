@@ -28,7 +28,7 @@ export const products = [
   },
   {
     href: '/ana',
-    badge: 'RAG coach',
+    badge: 'Nutrition-aware coach',
     title: 'FitLife Coach',
     desc: 'Ask for meal ideas, recovery suggestions, and ingredient swaps from a nutrition-aware AI assistant.',
   },
@@ -39,6 +39,6 @@ export const stackHighlights = [
   'Flask API gateway with JWT auth',
   'OCR label extraction pipeline',
   'YOLOv8-based workout analysis',
-  'RAG meal coach with chat history',
+  'Knowledge-grounded meal coach with chat history',
   'Dashboard flows for scans and workouts',
 ];

@@ -38,7 +38,7 @@ export default function SettingsPage() {
     setGoal(user.goal || '');
   }, [user, authLoading, router]);
 
-  if (authLoading || !user) return <div className="flex min-h-[60vh] items-center justify-center text-text-secondary">Loading...</div>;
+  if (authLoading || !user) return <div className="flex min-h-[60vh] items-center justify-center px-4 text-text-secondary">Loading...</div>;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -82,7 +82,7 @@ export default function SettingsPage() {
   const selectClass = 'w-full rounded-lg border border-border bg-bg-tertiary px-4 py-2.5 text-sm text-text-primary transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent';
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-12">
+    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-12">
       <Link href="/dashboard" className="mb-4 inline-block text-sm text-text-tertiary hover:text-text-primary">&larr; Dashboard</Link>
       <h1 className="mb-8 font-display text-2xl font-bold">Settings</h1>
 

@@ -37,16 +37,29 @@ export default function HeroSlogan() {
 
   return (
     <span className="fitlife-slogan-shell inline-flex justify-center text-accent" aria-live="polite">
-      <span key={`${phase}-${index}`} className={`fitlife-slogan-line fitlife-slogan-line--${phase}`}>
-        {words.map((word, wordIndex) => (
-          <span
-            key={`${index}-${word}-${wordIndex}`}
-            className="fitlife-slogan-word"
-            style={{ ['--word-index' as string]: wordIndex } as CSSProperties}
-          >
-            {word}
-          </span>
-        ))}
+      <span className="fitlife-slogan-stage">
+        <span aria-hidden className={`fitlife-slogan-line fitlife-slogan-line--${phase} fitlife-slogan-glow`}>
+          {words.map((word, wordIndex) => (
+            <span
+              key={`glow-${index}-${word}-${wordIndex}`}
+              className="fitlife-slogan-word"
+              style={{ ['--word-index' as string]: wordIndex } as CSSProperties}
+            >
+              {word}
+            </span>
+          ))}
+        </span>
+        <span key={`${phase}-${index}`} className={`fitlife-slogan-line fitlife-slogan-line--${phase}`}>
+          {words.map((word, wordIndex) => (
+            <span
+              key={`${index}-${word}-${wordIndex}`}
+              className="fitlife-slogan-word"
+              style={{ ['--word-index' as string]: wordIndex } as CSSProperties}
+            >
+              {word}
+            </span>
+          ))}
+        </span>
       </span>
     </span>
   );

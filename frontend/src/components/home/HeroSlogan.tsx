@@ -5,9 +5,9 @@ import { useEffect, useMemo, useState } from 'react';
 
 const slogans = [
   'One FitLife workflow.',
-  'One system for food and form.',
-  'One coach for meals and recovery.',
-  'One dashboard for better choices.',
+  'Food and form, together.',
+  'Meals meet recovery.',
+  'Better choices, daily.',
 ];
 
 const HOLD_MS = 2200;
@@ -36,7 +36,10 @@ export default function HeroSlogan() {
   }, [index]);
 
   return (
-    <span className="fitlife-slogan-shell inline-flex justify-center text-accent" aria-live="polite">
+    <span
+      className="fitlife-slogan-shell inline-flex max-w-full justify-center overflow-hidden px-2 text-accent"
+      aria-live="polite"
+    >
       <span className="fitlife-slogan-stage">
         <span aria-hidden className={`fitlife-slogan-line fitlife-slogan-line--${phase} fitlife-slogan-glow`}>
           {words.map((word, wordIndex) => (

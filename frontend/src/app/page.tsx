@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { products, stackHighlights } from '@/lib/site';
+import HeroSlogan from '@/components/home/HeroSlogan';
 
 const productIcons = [
   (
@@ -57,7 +58,7 @@ export default function HomePage() {
             <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
               Labels, lifts, and meals.
               <br />
-              <span className="text-accent">One FitLife workflow.</span>
+              <HeroSlogan />
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-text-secondary">
               FitLife packages OCR nutrition scanning, video-based form analysis, and an AI meal coach into one product experience built with Next.js, Flask, computer vision, and RAG.

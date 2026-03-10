@@ -93,6 +93,30 @@ body {
   background: linear-gradient(135deg, var(--surface-panel-start), var(--surface-panel-end));
 }
 
+@keyframes fitlife-slogan-slide {
+  0% {
+    opacity: 0;
+    transform: translateX(56px);
+    filter: blur(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+  }
+}
+
+.fitlife-slogan-slide {
+  animation: fitlife-slogan-slide 540ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity, filter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fitlife-slogan-slide {
+    animation: none;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }

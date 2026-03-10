@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import type { CSSProperties } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const slogans = [
   'One FitLife workflow.',
@@ -9,23 +10,44 @@ const slogans = [
   'One dashboard for better choices.',
 ];
 
+const HOLD_MS = 2200;
+const EXIT_WINDOW_MS = 520;
+
 export default function HeroSlogan() {
   const [index, setIndex] = useState(0);
+  const [phase, setPhase] = useState<'enter' | 'exit'>('enter');
+
+  const words = useMemo(() => slogans[index].split(' '), [index]);
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
-      setIndex((current) => (current + 1) % slogans.length);
-    }, 3200);
+    const exitTimer = window.setTimeout(() => {
+      setPhase('exit');
+    }, HOLD_MS);
 
-    return () => window.clearInterval(interval);
-  }, []);
+    const swapTimer = window.setTimeout(() => {
+      setIndex((current) => (current + 1) % slogans.length);
+      setPhase('enter');
+    }, HOLD_MS + EXIT_WINDOW_MS);
+
+    return () => {
+      window.clearTimeout(exitTimer);
+      window.clearTimeout(swapTimer);
+    };
+  }, [index]);
 
   return (
-    <span
-      key={slogans[index]}
-      className="fitlife-slogan-slide inline-block text-accent"
-    >
-      {slogans[index]}
+    <span className="fitlife-slogan-shell inline-flex justify-center text-accent" aria-live="polite">
+      <span key={`${phase}-${index}`} className={`fitlife-slogan-line fitlife-slogan-line--${phase}`}>
+        {words.map((word, wordIndex) => (
+          <span
+            key={`${index}-${word}-${wordIndex}`}
+            className="fitlife-slogan-word"
+            style={{ ['--word-index' as string]: wordIndex } as CSSProperties}
+          >
+            {word}
+          </span>
+        ))}
+      </span>
     </span>
   );
 }

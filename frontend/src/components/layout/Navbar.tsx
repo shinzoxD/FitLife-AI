@@ -34,9 +34,9 @@ export default function Navbar() {
             <>
               <Link
                 href="/dashboard"
-                className="rounded-lg px-4 py-2 text-sm text-text-secondary transition-colors hover:text-text-primary"
+                className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white shadow-md shadow-accent/15 transition-colors hover:bg-accent-hover"
               >
-                Dashboard
+                Open Dashboard
               </Link>
               <button
                 onClick={logout}
@@ -57,7 +57,7 @@ export default function Navbar() {
                 href="/register"
                 className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white shadow-md shadow-accent/15 transition-colors hover:bg-accent-hover"
               >
-                Launch Demo
+                Get Started
               </Link>
             </>
           )}

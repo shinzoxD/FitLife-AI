@@ -74,9 +74,9 @@ export default function MobileMenu({ open, onClose, links, user, onLogout }: Pro
               <Link
                 href="/dashboard"
                 onClick={onClose}
-                className="block w-full rounded-lg bg-bg-tertiary px-4 py-3 text-center text-sm text-text-primary hover:bg-bg-elevated"
+                className="block w-full rounded-lg bg-accent px-4 py-3 text-center text-sm font-medium text-white hover:bg-accent-hover"
               >
-                Dashboard
+                Open Dashboard
               </Link>
               <button
                 onClick={() => {
@@ -102,7 +102,7 @@ export default function MobileMenu({ open, onClose, links, user, onLogout }: Pro
                 onClick={onClose}
                 className="block w-full rounded-lg bg-accent px-4 py-3 text-center text-sm font-medium text-white hover:bg-accent-hover"
               >
-                Launch Demo
+                Get Started
               </Link>
             </>
           )}

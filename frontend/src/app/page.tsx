@@ -26,6 +26,12 @@ const featureProof = [
   ['Production-style stack', 'Next.js 15 frontend, Flask gateway, OCR, YOLOv8, and retrieval chat.'],
 ];
 
+const heroSignals = [
+  'OCR nutrition scans',
+  'Workout video analysis',
+  'Profile-aware AI coaching',
+];
+
 const differentiators = [
   ['Connected product surfaces', 'Fuel Scan, Form Coach, and FitLife Coach work together as one training workflow.'],
   ['Profile-aware guidance', 'Nutrition scoring and coaching stay grounded in the user profile instead of generic tips.'],
@@ -58,19 +64,15 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="mt-10 flex items-center justify-center gap-4">
-            <Link
-              href="/register"
-              className="rounded-lg bg-accent px-7 py-3 text-sm font-medium text-white shadow-lg shadow-accent/15 transition-all hover:bg-accent-hover hover:shadow-xl hover:shadow-accent/20"
-            >
-              Explore the App
-            </Link>
-            <Link
-              href="/developers"
-              className="rounded-lg border border-border px-7 py-3 text-sm text-text-secondary transition-colors hover:border-border-hover hover:text-text-primary"
-            >
-              View Architecture
-            </Link>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            {heroSignals.map((signal) => (
+              <div
+                key={signal}
+                className="rounded-full border border-border bg-bg-secondary/80 px-4 py-2 text-xs font-medium text-text-secondary shadow-sm shadow-black/5"
+              >
+                {signal}
+              </div>
+            ))}
           </div>
 
           <div className="mt-16 grid gap-4 md:grid-cols-3">

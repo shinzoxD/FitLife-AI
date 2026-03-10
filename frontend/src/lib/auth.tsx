@@ -8,7 +8,7 @@ import {
   useCallback,
   type ReactNode,
 } from 'react';
-import { apiFetch, clearTokens } from './api';
+import { apiFetch, clearTokens, getTokens, refreshAccessToken } from './api';
 import type { User, AuthResponse } from './types';
 
 interface AuthState {
@@ -44,10 +44,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUser = useCallback(async () => {
     try {
-      const token = localStorage.getItem('access_token');
-      if (!token) {
+      const { access, refresh } = getTokens();
+      if (!access && !refresh) {
         setUser(null);
         return;
+      }
+      if (!access && refresh) {
+        const renewed = await refreshAccessToken();
+        if (!renewed) {
+          setUser(null);
+          return;
+        }
       }
       const u = await apiFetch<User>('/user');
       setUser(u);

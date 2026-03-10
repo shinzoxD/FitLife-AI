@@ -3,11 +3,14 @@
 import { useState, useRef, type DragEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
+import { getPreferredNutritionProfile, saveNutritionProfile } from '@/lib/nutri-profile';
 import Button from '@/components/ui/Button';
 import Alert from '@/components/ui/Alert';
 
 export default function UploadDropzone() {
   const router = useRouter();
+  const { user } = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -58,20 +61,8 @@ export default function UploadDropzone() {
     setUploading(true);
     setError('');
     try {
-      const profileStr = sessionStorage.getItem('nutri_profile');
-      const userProfile = profileStr
-        ? JSON.parse(profileStr)
-        : {
-            age: 25,
-            gender: 'male',
-            height_cm: 170,
-            weight_kg: 70,
-            activity_level: 'moderate',
-            diet_type: 'omnivore',
-            goal: 'maintain weight',
-            allergies: [],
-            medical_history: { diseases: [] },
-          };
+      const userProfile = getPreferredNutritionProfile(user);
+      saveNutritionProfile(userProfile);
       const result = await apiFetch('/nutri-ai/analyze', {
         method: 'POST',
         body: JSON.stringify({ nutrition_info: nutritionData, user_profile: userProfile }),

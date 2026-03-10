@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import NutriHeroActions from '@/components/nutri-ai/NutriHeroActions';
 
 const steps = [
   { title: 'Set your baseline', desc: 'Capture your age, goal, activity level, and diet so the scoring model has useful context.' },
@@ -23,20 +23,7 @@ export default function NutriAIPage() {
           <p className="mx-auto mt-6 max-w-2xl text-lg text-text-secondary">
             Fuel Scan reads packaged nutrition labels, calculates a fit score, and explains the tradeoffs based on your training goal and profile.
           </p>
-          <div className="mt-10 flex items-center justify-center gap-4">
-            <Link
-              href="/nutri-ai/profile"
-              className="rounded-lg bg-accent px-7 py-3 text-sm font-medium text-white shadow-lg shadow-accent/20 hover:bg-accent-hover"
-            >
-              Start a Scan
-            </Link>
-            <Link
-              href="/nutri-ai/upload"
-              className="rounded-lg border border-border px-7 py-3 text-sm text-text-secondary hover:border-border-hover hover:text-text-primary"
-            >
-              Jump to Upload
-            </Link>
-          </div>
+          <NutriHeroActions />
         </div>
       </section>
 

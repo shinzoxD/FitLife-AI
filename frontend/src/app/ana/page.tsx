@@ -48,7 +48,7 @@ export default function AnaPage() {
   }
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-130px)] max-w-3xl flex-col px-4 py-4 sm:px-6">
+    <div className="mx-auto flex min-h-[calc(100dvh-120px)] max-w-3xl flex-col px-4 py-4 sm:px-6 md:h-[calc(100vh-130px)]">
       <div className="flex items-center gap-3 border-b border-border pb-4">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent-hover">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

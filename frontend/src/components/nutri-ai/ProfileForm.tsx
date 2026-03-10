@@ -1,13 +1,18 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth';
+import { apiFetch } from '@/lib/api';
+import { buildNutritionProfileFromUser, getSessionNutritionProfile, saveNutritionProfile } from '@/lib/nutri-profile';
 import Button from '@/components/ui/Button';
 import Alert from '@/components/ui/Alert';
 
 export default function ProfileForm() {
   const router = useRouter();
+  const { user, refreshUser } = useAuth();
   const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('male');
   const [height, setHeight] = useState('');
@@ -19,7 +24,19 @@ export default function ProfileForm() {
   const selectClass =
     'w-full rounded-lg border border-border bg-bg-tertiary px-4 py-2.5 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent';
 
-  function handleSubmit(event: FormEvent) {
+  useEffect(() => {
+    const storedProfile = buildNutritionProfileFromUser(user) ?? getSessionNutritionProfile();
+    if (!storedProfile) return;
+    setAge(storedProfile.age.toString());
+    setGender(storedProfile.gender);
+    setHeight(storedProfile.height_cm.toString());
+    setWeight(storedProfile.weight_kg.toString());
+    setActivity(storedProfile.activity_level);
+    setDiet(storedProfile.diet_type);
+    setGoal(storedProfile.goal);
+  }, [user]);
+
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError('');
 
@@ -35,8 +52,33 @@ export default function ProfileForm() {
       medical_history: { diseases: [] },
     };
 
-    sessionStorage.setItem('nutri_profile', JSON.stringify(profile));
-    router.push('/nutri-ai/upload');
+    setSaving(true);
+    try {
+      if (user) {
+        await apiFetch('/user/settings', {
+          method: 'PUT',
+          body: JSON.stringify({
+            age: profile.age,
+            gender: profile.gender,
+            height_cm: profile.height_cm,
+            weight_kg: profile.weight_kg,
+            activity_level: profile.activity_level,
+            diet_type: profile.diet_type,
+            goal: profile.goal,
+            allergies: profile.allergies,
+            medical_conditions: profile.medical_history.diseases,
+          }),
+        });
+        await refreshUser();
+      }
+
+      saveNutritionProfile(profile);
+      router.push('/nutri-ai/upload');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unable to save your nutrition profile.');
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -122,7 +164,7 @@ export default function ProfileForm() {
         </div>
       </div>
 
-      <Button type="submit" size="lg" className="w-full">Save Profile and Continue</Button>
+      <Button type="submit" size="lg" loading={saving} className="w-full">Save Profile and Continue</Button>
     </form>
   );
 }

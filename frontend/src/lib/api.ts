@@ -1,6 +1,6 @@
 const API_BASE = `${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1`;
 
-function getTokens() {
+export function getTokens() {
   if (typeof window === 'undefined') return { access: null, refresh: null };
   return {
     access: localStorage.getItem('access_token'),
@@ -18,7 +18,7 @@ export function clearTokens() {
   localStorage.removeItem('refresh_token');
 }
 
-async function refreshAccessToken(): Promise<string | null> {
+export async function refreshAccessToken(): Promise<string | null> {
   const { refresh } = getTokens();
   if (!refresh) return null;
   try {

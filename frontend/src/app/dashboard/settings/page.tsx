@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { apiFetch } from '@/lib/api';
+import { saveNutritionProfile } from '@/lib/nutri-profile';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Alert from '@/components/ui/Alert';
@@ -56,6 +57,17 @@ export default function SettingsPage() {
           diet_type: dietType || null,
           goal: goal || null,
         }),
+      });
+      saveNutritionProfile({
+        age: age ? parseInt(age) : 25,
+        gender: gender || 'male',
+        height_cm: heightCm ? parseFloat(heightCm) : 170,
+        weight_kg: weightKg ? parseFloat(weightKg) : 70,
+        activity_level: activityLevel || 'moderate',
+        diet_type: dietType || 'omnivore',
+        goal: goal || 'maintain',
+        allergies: user?.allergies || [],
+        medical_history: { diseases: user?.medical_conditions || [] },
       });
       await refreshUser();
       setMessage({ type: 'success', text: 'Settings saved successfully.' });

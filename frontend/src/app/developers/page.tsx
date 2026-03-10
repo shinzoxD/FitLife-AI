@@ -18,10 +18,10 @@ export default function DevelopersPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-24">
       <div className="mb-16 text-center">
-        <span className="mb-4 inline-block rounded-full border border-accent/30 bg-accent-glow px-3 py-1 text-xs font-semibold text-accent">API</span>
-        <h1 className="font-display text-4xl font-bold">Architecture and API</h1>
+        <span className="mb-4 inline-block rounded-full border border-accent/30 bg-accent-glow px-3 py-1 text-xs font-semibold text-accent">Build</span>
+        <h1 className="font-display text-4xl font-bold">FitLife Architecture</h1>
         <p className="mx-auto mt-4 max-w-2xl text-text-secondary">
-          FitLife uses a product-style architecture: a Next.js frontend, Flask gateway, AI services, and authenticated JSON endpoints designed for demoability and extension.
+          FitLife uses a product-style architecture: a Next.js frontend, Flask gateway, AI services, and a shared data layer that keeps nutrition, workouts, and coaching connected.
         </p>
       </div>
 
@@ -36,26 +36,8 @@ export default function DevelopersPage() {
         </div>
       </section>
 
-      <section className="mb-16">
-        <h2 className="mb-6 font-display text-2xl font-bold">Authentication</h2>
-        <p className="mb-4 text-text-secondary">All authenticated endpoints require a Bearer token in the Authorization header.</p>
-        <div className="rounded-xl border border-border bg-bg-primary p-6 font-mono text-sm">
-          <div className="text-text-tertiary"># Login to get tokens</div>
-          <div className="mt-1">
-            <span className="text-accent">curl</span> -X POST http://localhost:5000/api/v1/auth/login \
-          </div>
-          <div className="pl-4">-H &quot;Content-Type: application/json&quot; \</div>
-          <div className="pl-4">-d {`'{"email":"user@example.com","password":"secret123"}'`}</div>
-          <div className="mt-4 text-text-tertiary"># Use the access token in subsequent requests</div>
-          <div className="mt-1">
-            <span className="text-accent">curl</span> http://localhost:5000/api/v1/user \
-          </div>
-          <div className="pl-4">-H &quot;Authorization: Bearer YOUR_ACCESS_TOKEN&quot;</div>
-        </div>
-      </section>
-
       <section>
-        <h2 className="mb-6 font-display text-2xl font-bold">Endpoints</h2>
+        <h2 className="mb-6 font-display text-2xl font-bold">Core API Routes</h2>
         <div className="overflow-hidden rounded-xl border border-border">
           <table className="w-full text-sm">
             <thead className="bg-bg-secondary text-left text-text-tertiary">

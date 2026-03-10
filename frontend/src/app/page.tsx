@@ -32,6 +32,12 @@ const differentiators = [
   ['Practical feedback loops', 'Each tool is designed to turn uploads and questions into clear next actions.'],
 ];
 
+const sessionFlow = [
+  ['1', 'Capture an input', 'Scan a food label, upload a lift, or ask a nutrition question.'],
+  ['2', 'Get profile-aware analysis', 'FitLife combines your goal, activity level, and history before responding.'],
+  ['3', 'Turn feedback into action', 'Use clear scores, notes, and meal suggestions to improve the next session.'],
+];
+
 export default function HomePage() {
   return (
     <>
@@ -111,11 +117,11 @@ export default function HomePage() {
           <div className="grid items-center gap-12 md:grid-cols-2">
             <div>
               <span className="rounded-full border border-accent/30 bg-accent-glow px-3 py-1 text-xs font-semibold text-accent">
-                Built Like a Product
+                Daily Workflow
               </span>
-              <h2 className="mt-4 font-display text-3xl font-bold">Strong resume signal without feeling like a toy</h2>
+              <h2 className="mt-4 font-display text-3xl font-bold">Built to turn inputs into useful coaching</h2>
               <p className="mt-4 leading-relaxed text-text-secondary">
-                FitLife demonstrates frontend craft, system design, AI integration, and product thinking in one repo. The flows are opinionated, measurable, and easy to demo.
+                FitLife brings food scans, workout analysis, and nutrition coaching into one loop so each interaction leads to a practical next step.
               </p>
               <ul className="mt-6 space-y-3">
                 {stackHighlights.map((item) => (
@@ -127,16 +133,20 @@ export default function HomePage() {
               </ul>
             </div>
 
-            <div className="rounded-2xl border border-border bg-bg-primary p-6 font-mono text-sm shadow-sm shadow-black/5">
-              <div className="mb-1 text-text-tertiary"># Upload a food label to Fuel Scan</div>
-              <div>
-                <span className="text-accent">curl</span> -X POST /api/v1/nutri-ai/upload \
-              </div>
-              <div className="pl-4">-H &quot;Authorization: Bearer $TOKEN&quot; \</div>
-              <div className="pl-4">-F &quot;image=@label.jpg&quot;</div>
-              <div className="mt-6 mb-1 text-text-tertiary"># Poll a workout analysis job</div>
-              <div>
-                <span className="text-accent">curl</span> /api/v1/muscle-ai/task/TASK_ID
+            <div className="rounded-2xl border border-border bg-bg-primary p-6 shadow-sm shadow-black/5">
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-text-tertiary">How a session flows</p>
+              <div className="mt-6 space-y-5">
+                {sessionFlow.map(([step, title, desc]) => (
+                  <div key={step} className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent-glow text-sm font-semibold text-accent">
+                      {step}
+                    </div>
+                    <div>
+                      <p className="font-semibold">{title}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-text-secondary">{desc}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -167,15 +177,15 @@ export default function HomePage() {
 
       <section className="border-t border-border bg-bg-secondary">
         <div className="mx-auto max-w-3xl px-6 py-24 text-center">
-          <h2 className="font-display text-3xl font-bold">Take FitLife from polished demo to interview talking point.</h2>
+          <h2 className="font-display text-3xl font-bold">Start building a better nutrition and training routine.</h2>
           <p className="mt-4 text-text-secondary">
-            Walk through the product flows, explain the architecture, and ship it as a resume project with real technical depth.
+            Create an account, set your profile, and use Fuel Scan, Form Coach, and FitLife Coach from one place.
           </p>
           <Link
             href="/register"
             className="mt-8 inline-block rounded-lg bg-accent px-8 py-3.5 text-sm font-medium text-white shadow-lg shadow-accent/20 transition-all hover:bg-accent-hover"
           >
-            Launch the Demo
+            Get Started
           </Link>
         </div>
       </section>

@@ -50,36 +50,36 @@ export default function HomePage() {
     <>
       <section className="relative overflow-hidden">
         <div className="fitlife-hero-glow absolute inset-0" />
-        <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-24">
+        <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-20 sm:px-6 sm:pb-20 sm:pt-24">
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-flex rounded-full border border-accent/30 bg-accent-glow px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-accent">
               FitLife AI
             </span>
-            <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="mt-6 font-display text-[clamp(2.75rem,13vw,4.75rem)] font-bold leading-[0.98] tracking-tight lg:text-6xl">
               Labels, lifts, and meals.
               <br />
               <HeroSlogan />
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-text-secondary">
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-text-secondary sm:mt-6 sm:text-lg">
               FitLife packages OCR nutrition scanning, video-based form analysis, and an AI meal coach into one product experience built with Next.js, Flask, computer vision, and grounded nutrition guidance.
             </p>
           </div>
 
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5 sm:mt-10 sm:gap-3">
             {heroSignals.map((signal) => (
               <div
                 key={signal}
-                className="rounded-full border border-border bg-bg-secondary/80 px-4 py-2 text-xs font-medium text-text-secondary shadow-sm shadow-black/5"
+                className="rounded-full border border-border bg-bg-secondary/80 px-4 py-2 text-[11px] font-medium text-text-secondary shadow-sm shadow-black/5 sm:text-xs"
               >
                 {signal}
               </div>
             ))}
           </div>
 
-          <div className="mt-16 grid gap-4 md:grid-cols-3">
+          <div className="mt-12 grid gap-4 sm:mt-16 md:grid-cols-3">
             {featureProof.map(([title, desc]) => (
-              <div key={title} className="rounded-2xl border border-border bg-bg-secondary/80 p-6 text-left shadow-sm shadow-black/5">
-                <p className="font-display text-lg font-semibold">{title}</p>
+              <div key={title} className="rounded-2xl border border-border bg-bg-secondary/80 p-5 text-left shadow-sm shadow-black/5 sm:p-6">
+                <p className="font-display text-base font-semibold sm:text-lg">{title}</p>
                 <p className="mt-2 text-sm leading-relaxed text-text-secondary">{desc}</p>
               </div>
             ))}

@@ -137,6 +137,7 @@ body {
   justify-content: center;
   gap: 0.3em;
   white-space: nowrap;
+  line-height: 1;
 }
 
 .fitlife-slogan-glow {
@@ -173,6 +174,30 @@ body {
   .fitlife-slogan-line--enter .fitlife-slogan-word,
   .fitlife-slogan-line--exit .fitlife-slogan-word {
     animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .fitlife-slogan-shell {
+    display: block;
+    min-height: 2.2em;
+    width: 100%;
+    padding-inline: 0;
+  }
+
+  .fitlife-slogan-stage {
+    width: 100%;
+  }
+
+  .fitlife-slogan-line {
+    width: 100%;
+    flex-wrap: wrap;
+    row-gap: 0.08em;
+    white-space: normal;
+  }
+
+  .fitlife-slogan-glow {
+    filter: blur(10px);
   }
 }
 

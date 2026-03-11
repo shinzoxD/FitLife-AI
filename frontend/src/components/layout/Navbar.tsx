@@ -13,7 +13,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-bg-primary/80 backdrop-blur-lg">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
         <Link href="/" className="text-xl font-bold font-display tracking-tight text-text-primary">
           {site.name}
         </Link>
@@ -66,14 +66,14 @@ export default function Navbar() {
         </div>
 
         <button
-          className="flex flex-col gap-1.5 md:hidden"
+          className="flex rounded-xl border border-border bg-bg-secondary/80 p-2.5 text-text-primary shadow-sm shadow-black/5 transition-colors hover:border-border-hover hover:bg-bg-elevated md:hidden"
           onClick={() => setMobileOpen(true)}
           aria-label="Open menu"
           aria-expanded={mobileOpen}
         >
-          <span className="block h-0.5 w-6 bg-text-primary" />
-          <span className="block h-0.5 w-6 bg-text-primary" />
-          <span className="block h-0.5 w-6 bg-text-primary" />
+          <span className="block h-0.5 w-6 bg-current" />
+          <span className="mt-1.5 block h-0.5 w-6 bg-current" />
+          <span className="mt-1.5 block h-0.5 w-6 bg-current" />
         </button>
       </nav>
 

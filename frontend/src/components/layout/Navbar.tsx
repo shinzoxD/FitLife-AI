@@ -66,14 +66,14 @@ export default function Navbar() {
         </div>
 
         <button
-          className="flex rounded-xl border border-border bg-bg-secondary/80 p-2.5 text-text-primary shadow-sm shadow-black/5 transition-colors hover:border-border-hover hover:bg-bg-elevated md:hidden"
+          className="flex flex-col items-center justify-center rounded-2xl border border-border bg-bg-secondary/90 p-3 text-text-primary shadow-sm shadow-black/5 transition-colors hover:border-border-hover hover:bg-bg-elevated md:hidden"
           onClick={() => setMobileOpen(true)}
           aria-label="Open menu"
           aria-expanded={mobileOpen}
         >
-          <span className="block h-0.5 w-6 bg-current" />
-          <span className="mt-1.5 block h-0.5 w-6 bg-current" />
-          <span className="mt-1.5 block h-0.5 w-6 bg-current" />
+          <span className="block h-0.5 w-7 rounded-full bg-current" />
+          <span className="mt-1.5 block h-0.5 w-7 rounded-full bg-current" />
+          <span className="mt-1.5 block h-0.5 w-7 rounded-full bg-current" />
         </button>
       </nav>
 

@@ -4,6 +4,7 @@ import { useTheme } from '@/lib/theme';
 
 interface ThemeToggleProps {
   compact?: boolean;
+  className?: string;
 }
 
 function SunIcon() {
@@ -30,7 +31,7 @@ function MoonIcon() {
   );
 }
 
-export default function ThemeToggle({ compact = false }: ThemeToggleProps) {
+export default function ThemeToggle({ compact = false, className = '' }: ThemeToggleProps) {
   const { theme, mounted, toggleTheme } = useTheme();
   const isDark = mounted ? theme === 'dark' : false;
   const label = isDark ? 'Light mode' : 'Dark mode';
@@ -40,7 +41,7 @@ export default function ThemeToggle({ compact = false }: ThemeToggleProps) {
       <button
         type="button"
         onClick={toggleTheme}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-bg-secondary text-text-secondary transition-colors hover:border-border-hover hover:bg-bg-tertiary hover:text-text-primary"
+        className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-bg-secondary text-text-secondary transition-colors hover:border-border-hover hover:bg-bg-tertiary hover:text-text-primary ${className}`.trim()}
         aria-label={label}
         title={label}
       >
@@ -53,7 +54,7 @@ export default function ThemeToggle({ compact = false }: ThemeToggleProps) {
     <button
       type="button"
       onClick={toggleTheme}
-      className="flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-bg-secondary px-4 py-3 text-sm text-text-secondary transition-colors hover:border-border-hover hover:bg-bg-tertiary hover:text-text-primary"
+      className={`flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-bg-secondary px-4 py-3 text-sm text-text-secondary transition-colors hover:border-border-hover hover:bg-bg-tertiary hover:text-text-primary ${className}`.trim()}
       aria-label={label}
     >
       {isDark ? <SunIcon /> : <MoonIcon />}

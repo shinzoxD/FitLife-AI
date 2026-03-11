@@ -35,19 +35,19 @@ export default function MobileMenu({ open, onClose, links, user, loading = false
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 md:hidden">
-      <div className="absolute inset-0 bg-black/55 backdrop-blur-md" onClick={onClose} />
+    <div className="fixed inset-0 z-50 bg-[#081114]/94 md:hidden">
+      <div className="absolute inset-0 bg-black/45 backdrop-blur-sm" onClick={onClose} />
       <div
         ref={panelRef}
-        className="absolute right-0 top-0 flex h-full w-full max-w-full flex-col border-l border-border bg-bg-secondary/98 shadow-2xl shadow-black/35 backdrop-blur-xl animate-in slide-in-from-right sm:w-[24rem]"
+        className="absolute inset-y-0 right-0 flex h-full w-full max-w-full flex-col border-l border-border bg-bg-primary shadow-2xl shadow-black/45 animate-in slide-in-from-right sm:w-[24rem]"
         role="dialog"
         aria-modal="true"
       >
-        <div className="flex items-center justify-between border-b border-border px-5 py-4 sm:px-6">
+        <div className="flex items-center justify-between border-b border-border px-5 pb-4 pt-6 sm:px-6">
           <span className="font-display text-lg font-bold">{site.name}</span>
           <button
             onClick={onClose}
-            className="rounded-lg border border-border p-2 text-text-secondary transition-colors hover:border-border-hover hover:bg-bg-elevated hover:text-text-primary"
+            className="rounded-xl border border-border bg-bg-secondary p-3 text-text-secondary transition-colors hover:border-border-hover hover:bg-bg-elevated hover:text-text-primary"
             aria-label="Close menu"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -57,13 +57,13 @@ export default function MobileMenu({ open, onClose, links, user, loading = false
         </div>
 
         <nav className="flex-1 overflow-y-auto px-5 py-5 sm:px-6">
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {links.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
                   onClick={onClose}
-                  className="block rounded-xl border border-transparent px-4 py-3 text-base text-text-secondary transition-colors hover:border-border hover:bg-bg-tertiary hover:text-text-primary"
+                  className="block rounded-2xl border border-border bg-bg-secondary px-4 py-4 text-lg font-medium text-text-primary transition-colors hover:border-border-hover hover:bg-bg-elevated"
                 >
                   {link.label}
                 </Link>
@@ -72,8 +72,8 @@ export default function MobileMenu({ open, onClose, links, user, loading = false
           </ul>
         </nav>
 
-        <div className="space-y-3 border-t border-border px-5 py-5 sm:px-6">
-          <ThemeToggle />
+        <div className="space-y-3 border-t border-border px-5 py-5 pb-8 sm:px-6">
+          <ThemeToggle className="w-full justify-center rounded-2xl bg-bg-secondary py-4 text-base" />
           {loading ? (
             <div className="h-12 animate-pulse rounded-lg border border-border bg-bg-tertiary" />
           ) : user ? (
@@ -81,7 +81,7 @@ export default function MobileMenu({ open, onClose, links, user, loading = false
               <Link
                 href="/dashboard"
                 onClick={onClose}
-                className="block w-full rounded-lg bg-accent px-4 py-3 text-center text-sm font-medium text-white hover:bg-accent-hover"
+                className="block w-full rounded-2xl bg-accent px-4 py-4 text-center text-base font-medium text-white hover:bg-accent-hover"
               >
                 Open Dashboard
               </Link>
@@ -90,7 +90,7 @@ export default function MobileMenu({ open, onClose, links, user, loading = false
                   onLogout();
                   onClose();
                 }}
-                className="block w-full rounded-lg border border-border px-4 py-3 text-center text-sm text-text-secondary hover:text-text-primary"
+                className="block w-full rounded-2xl border border-border bg-bg-secondary px-4 py-4 text-center text-base text-text-primary"
               >
                 Sign Out
               </button>
@@ -100,14 +100,14 @@ export default function MobileMenu({ open, onClose, links, user, loading = false
               <Link
                 href="/login"
                 onClick={onClose}
-                className="block w-full rounded-lg bg-bg-tertiary px-4 py-3 text-center text-sm text-text-primary hover:bg-bg-elevated"
+                className="block w-full rounded-2xl bg-bg-secondary px-4 py-4 text-center text-base text-text-primary hover:bg-bg-elevated"
               >
                 Sign In
               </Link>
               <Link
                 href="/register"
                 onClick={onClose}
-                className="block w-full rounded-lg bg-accent px-4 py-3 text-center text-sm font-medium text-white hover:bg-accent-hover"
+                className="block w-full rounded-2xl bg-accent px-4 py-4 text-center text-base font-medium text-white hover:bg-accent-hover"
               >
                 Get Started
               </Link>

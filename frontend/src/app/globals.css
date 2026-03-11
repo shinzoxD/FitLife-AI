@@ -71,6 +71,7 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
   transition:
     background-color 180ms ease,
     color 180ms ease,
@@ -180,8 +181,10 @@ body {
 @media (max-width: 640px) {
   .fitlife-slogan-shell {
     display: block;
-    min-height: 2.2em;
+    min-height: 2em;
     width: 100%;
+    max-width: 10.5ch;
+    margin-inline: auto;
     padding-inline: 0;
   }
 
@@ -192,12 +195,14 @@ body {
   .fitlife-slogan-line {
     width: 100%;
     flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.18em;
     row-gap: 0.08em;
     white-space: normal;
   }
 
   .fitlife-slogan-glow {
-    filter: blur(10px);
+    display: none;
   }
 }
 

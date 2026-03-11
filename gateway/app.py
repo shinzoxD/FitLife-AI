@@ -7,6 +7,7 @@ legacy routes available as redirects for compatibility.
 
 import os
 import sys
+import time
 import secrets
 from pathlib import Path
 from datetime import datetime, timezone
@@ -18,12 +19,14 @@ load_dotenv(PROJECT_ROOT_EARLY / '.env')
 from flask import (
     Flask, render_template, redirect, request, Response,
     url_for, flash, jsonify, session, g,
+    current_app, has_app_context,
 )
 from flask_cors import CORS
 from flask_login import (
     LoginManager, login_user, logout_user, login_required, current_user,
 )
 from authlib.integrations.flask_client import OAuth
+from sqlalchemy.exc import InterfaceError, OperationalError
 from werkzeug.utils import secure_filename
 import requests as http_requests
 
@@ -63,6 +66,7 @@ def _runtime_data_root() -> Path:
 
 
 UPLOAD_FOLDER = _runtime_data_root() / 'uploads'
+TRANSIENT_DB_ERRORS = (OperationalError, InterfaceError)
 
 
 def _service_urls():
@@ -245,6 +249,29 @@ def _absolute_url(path: str | None) -> str | None:
     return f"{_public_origin()}{path}"
 
 
+def _with_db_retry(operation_name: str, callback, *, retries: int = 1, base_delay: float = 0.8):
+    last_error = None
+    for attempt in range(retries + 1):
+        try:
+            return callback()
+        except TRANSIENT_DB_ERRORS as exc:
+            last_error = exc
+            db.session.rollback()
+            if attempt >= retries:
+                raise
+            app_logger = current_app.logger if has_app_context() else None
+            if app_logger:
+                app_logger.warning(
+                    'Transient database error during %s (attempt %s/%s): %s',
+                    operation_name,
+                    attempt + 1,
+                    retries + 1,
+                    exc,
+                )
+            time.sleep(base_delay * (attempt + 1))
+    raise last_error
+
+
 def _save_workout_session(user_id: int | None, exercise_type: str, result: dict) -> None:
     if not user_id:
         return
@@ -265,8 +292,11 @@ def _save_workout_session(user_id: int | None, exercise_type: str, result: dict)
         feedback=result.get('feedback') or result.get('recommendations') or [],
         video_path=result.get('video_url'),
     )
-    db.session.add(session)
-    db.session.commit()
+    def persist():
+        db.session.add(session)
+        db.session.commit()
+
+    _with_db_retry('save-workout-session', persist)
 
 
 def _run_local_muscle_analysis(video_path: Path, exercise_type: str) -> dict:
@@ -278,7 +308,7 @@ def _run_local_muscle_analysis(video_path: Path, exercise_type: str) -> dict:
 
 
 def _get_user_by_id(user_id):
-    return db.session.get(User, user_id)
+    return _with_db_retry('load-user', lambda: db.session.get(User, user_id))
 
 
 # ---------------------------------------------------------------------------
@@ -300,6 +330,10 @@ def create_app(config_name='development'):
         db_url = f'sqlite:///{PROJECT_ROOT / "data" / "fitlife.db"}'
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+    }
     app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID', '')
     app.config['GOOGLE_CLIENT_SECRET'] = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 
@@ -524,6 +558,7 @@ def _register_legacy_static_pages(app):
 # ===================================================================
 
 def _user_to_full_dict(user):
+    health_score = _with_db_retry('user-health-score', lambda: user.health_score)
     return {
         'id': user.id,
         'email': user.email,
@@ -538,7 +573,7 @@ def _user_to_full_dict(user):
         'goal': user.goal,
         'medical_conditions': user.medical_conditions or [],
         'allergies': user.allergies or [],
-        'health_score': user.health_score,
+        'health_score': health_score,
         'scans_this_month': user.scans_this_month,
         'created_at': user.created_at.isoformat() if user.created_at else None,
     }
@@ -554,15 +589,19 @@ def _register_api_auth(app):
 
         if not email or not password or not name:
             return jsonify({'error': 'Name, email, and password are required'}), 400
-        if User.query.filter_by(email=email).first():
+        if _with_db_retry('auth-register-lookup', lambda: User.query.filter_by(email=email).first()):
             return jsonify({'error': 'Email already registered'}), 409
         if len(password) < 8:
             return jsonify({'error': 'Password must be at least 8 characters'}), 400
 
-        user = User(email=email, name=name)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
+        def create_user():
+            user = User(email=email, name=name)
+            user.set_password(password)
+            db.session.add(user)
+            db.session.commit()
+            return user
+
+        user = _with_db_retry('auth-register-create', create_user)
 
         tokens = generate_tokens(user.id)
         return jsonify({**tokens, 'user': _user_to_full_dict(user)}), 201
@@ -573,12 +612,15 @@ def _register_api_auth(app):
         email = data.get('email', '').strip().lower()
         password = data.get('password', '')
 
-        user = User.query.filter_by(email=email).first()
+        user = _with_db_retry('auth-login-load', lambda: User.query.filter_by(email=email).first())
         if not user or not user.check_password(password):
             return jsonify({'error': 'Invalid email or password'}), 401
 
-        user.last_login = datetime.now(timezone.utc)
-        db.session.commit()
+        def mark_login():
+            user.last_login = datetime.now(timezone.utc)
+            db.session.commit()
+
+        _with_db_retry('auth-login-commit', mark_login)
         tokens = generate_tokens(user.id)
         return jsonify({**tokens, 'user': _user_to_full_dict(user)})
 
@@ -620,17 +662,24 @@ def _register_api_auth(app):
 
         name = user_info.get('name', '')
         google_id = user_info.get('sub')
-        user = User.query.filter_by(email=email).first()
+        user = _with_db_retry('google-auth-load', lambda: User.query.filter_by(email=email).first())
         if user:
-            user.last_login = datetime.now(timezone.utc)
-            if not user.google_id:
-                user.google_id = google_id
-            db.session.commit()
+            def touch_google_login():
+                user.last_login = datetime.now(timezone.utc)
+                if not user.google_id:
+                    user.google_id = google_id
+                db.session.commit()
+
+            _with_db_retry('google-auth-update', touch_google_login)
         else:
-            user = User(email=email, name=name, google_id=google_id)
-            user.set_password(secrets.token_urlsafe(32))
-            db.session.add(user)
-            db.session.commit()
+            def create_google_user():
+                user = User(email=email, name=name, google_id=google_id)
+                user.set_password(secrets.token_urlsafe(32))
+                db.session.add(user)
+                db.session.commit()
+                return user
+
+            user = _with_db_retry('google-auth-create', create_google_user)
 
         tokens = generate_tokens(user.id)
         frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
@@ -653,10 +702,13 @@ def _register_api_user(app):
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
-        Achievement.query.filter_by(user_id=user.id).delete()
-        APIKey.query.filter_by(user_id=user.id).delete()
-        db.session.delete(user)
-        db.session.commit()
+        def delete_user():
+            Achievement.query.filter_by(user_id=user.id).delete()
+            APIKey.query.filter_by(user_id=user.id).delete()
+            db.session.delete(user)
+            db.session.commit()
+
+        _with_db_retry('delete-user', delete_user)
         return jsonify({'status': 'deleted'})
 
     @app.route('/api/v1/user/settings', methods=['PUT'])
@@ -673,7 +725,7 @@ def _register_api_user(app):
             user.allergies = data['allergies']
         if 'medical_conditions' in data:
             user.medical_conditions = data['medical_conditions']
-        db.session.commit()
+        _with_db_retry('save-user-settings', db.session.commit)
         return jsonify(_user_to_full_dict(user))
 
     @app.route('/api/v1/user/scans', methods=['GET'])
@@ -681,7 +733,12 @@ def _register_api_user(app):
     def api_user_scans():
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
-        scans = ScanHistory.query.filter_by(user_id=g.current_user_id).order_by(ScanHistory.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+        scans = _with_db_retry(
+            'list-user-scans',
+            lambda: ScanHistory.query.filter_by(user_id=g.current_user_id)
+            .order_by(ScanHistory.created_at.desc())
+            .paginate(page=page, per_page=per_page, error_out=False),
+        )
         return jsonify({
             'items': [s.to_dict() for s in scans.items],
             'total': scans.total,
@@ -694,7 +751,12 @@ def _register_api_user(app):
     def api_user_workouts():
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
-        workouts = WorkoutSession.query.filter_by(user_id=g.current_user_id).order_by(WorkoutSession.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+        workouts = _with_db_retry(
+            'list-user-workouts',
+            lambda: WorkoutSession.query.filter_by(user_id=g.current_user_id)
+            .order_by(WorkoutSession.created_at.desc())
+            .paginate(page=page, per_page=per_page, error_out=False),
+        )
         return jsonify({
             'items': [w.to_dict() for w in workouts.items],
             'total': workouts.total,
@@ -711,12 +773,21 @@ def _register_api_dashboard(app):
         user = _get_user_by_id(uid)
         if not user:
             return jsonify({'error': 'User not found'}), 404
-        total_scans = ScanHistory.query.filter_by(user_id=uid).count()
-        total_workouts = WorkoutSession.query.filter_by(user_id=uid).count()
-        avg_nutrition = db.session.query(db.func.avg(ScanHistory.score)).filter_by(user_id=uid).scalar() or 0
-        avg_form = db.session.query(db.func.avg(WorkoutSession.form_score)).filter_by(user_id=uid).scalar() or 0
+
+        def load_dashboard_stats():
+            total_scans = ScanHistory.query.filter_by(user_id=uid).count()
+            total_workouts = WorkoutSession.query.filter_by(user_id=uid).count()
+            avg_nutrition = db.session.query(db.func.avg(ScanHistory.score)).filter_by(user_id=uid).scalar() or 0
+            avg_form = db.session.query(db.func.avg(WorkoutSession.form_score)).filter_by(user_id=uid).scalar() or 0
+            return total_scans, total_workouts, avg_nutrition, avg_form
+
+        total_scans, total_workouts, avg_nutrition, avg_form = _with_db_retry(
+            'dashboard-stats',
+            load_dashboard_stats,
+        )
+        health_score = _with_db_retry('dashboard-health-score', lambda: user.health_score)
         return jsonify({
-            'health_score': user.health_score,
+            'health_score': health_score,
             'total_scans': total_scans,
             'total_workouts': total_workouts,
             'avg_nutrition': round(float(avg_nutrition), 1),

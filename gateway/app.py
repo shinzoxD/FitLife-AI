@@ -299,6 +299,67 @@ def _save_workout_session(user_id: int | None, exercise_type: str, result: dict)
     _with_db_retry('save-workout-session', persist)
 
 
+def _extract_recommendations(explanation: str) -> list[str]:
+    if not explanation:
+        return []
+
+    marker = 'RECOMMENDATIONS:'
+    upper = explanation.upper()
+    marker_index = upper.find(marker)
+    if marker_index < 0:
+        return []
+
+    section = explanation[marker_index + len(marker):].strip()
+    if not section:
+        return []
+
+    recommendations: list[str] = []
+    for raw_line in section.splitlines():
+        line = raw_line.strip().lstrip('-*').strip()
+        if not line:
+            continue
+        recommendations.append(line)
+    return recommendations[:6]
+
+
+def _save_scan_history(user_id: int | None, payload: dict) -> None:
+    if not user_id:
+        return
+
+    def persist():
+        user = db.session.get(User, user_id)
+        if not user:
+            return
+
+        nutrition_info = payload.get('nutrition_info') or {}
+        product_name = (
+            payload.get('product_name')
+            or payload.get('source_name')
+            or nutrition_info.get('product_name')
+            or 'Fuel Scan'
+        )
+        brand = payload.get('brand') or nutrition_info.get('brand')
+        recommendations = payload.get('recommendations')
+        if recommendations is None:
+            recommendations = _extract_recommendations(str(payload.get('explanation') or ''))
+
+        scan = ScanHistory(
+            user_id=user_id,
+            product_name=str(product_name)[:255] if product_name else 'Fuel Scan',
+            brand=str(brand)[:255] if brand else None,
+            nutrition_data=nutrition_info,
+            score=float(payload.get('score', 0) or 0),
+            explanation=payload.get('explanation'),
+            recommendations=recommendations,
+            meal_type=payload.get('meal_type'),
+        )
+        user.increment_scan_count()
+        db.session.add(scan)
+        db.session.commit()
+
+    _with_db_retry('save-scan-history', persist)
+
+
 def _run_local_muscle_analysis(video_path: Path, exercise_type: str) -> dict:
     from services.muscle_ai_service.core.analysis import analyze_saved_video
 
@@ -830,13 +891,20 @@ def _register_api_services(app):
 
         health_metrics = calculate_health_metrics(user_profile)
         score, explanation = generate_score(user_profile, nutrition_info, health_metrics)
-        return jsonify({
+        result = {
             'success': True,
             'score': score,
             'explanation': explanation,
             'health_metrics': health_metrics,
             'nutrition_info': nutrition_info,
+        }
+        _save_scan_history(g.current_user_id, {
+            **result,
+            'product_name': data.get('product_name'),
+            'brand': data.get('brand'),
+            'meal_type': data.get('meal_type'),
         })
+        return jsonify(result)
 
     # -- Muscle AI ----------------------------------------------------------
     @app.route('/api/v1/muscle-ai/exercises', methods=['GET'])

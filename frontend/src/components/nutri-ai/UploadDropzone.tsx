@@ -63,9 +63,14 @@ export default function UploadDropzone() {
     try {
       const userProfile = getPreferredNutritionProfile(user);
       saveNutritionProfile(userProfile);
+      const derivedProductName = file?.name?.replace(/\.[^.]+$/, '') || 'Fuel Scan';
       const result = await apiFetch('/nutri-ai/analyze', {
         method: 'POST',
-        body: JSON.stringify({ nutrition_info: nutritionData, user_profile: userProfile }),
+        body: JSON.stringify({
+          nutrition_info: nutritionData,
+          user_profile: userProfile,
+          product_name: derivedProductName,
+        }),
       });
       sessionStorage.setItem('nutri_result', JSON.stringify(result));
       router.push('/nutri-ai/results');

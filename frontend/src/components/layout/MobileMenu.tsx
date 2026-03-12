@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import type { User } from '@/lib/types';
 import { site } from '@/lib/site';
+import { getTokens } from '@/lib/api';
 import ThemeToggle from './ThemeToggle';
 
 interface Props {
@@ -17,6 +18,12 @@ interface Props {
 
 export default function MobileMenu({ open, onClose, links, user, loading = false, onLogout }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const shouldShowLoadingState = useMemo(() => {
+    if (typeof window === 'undefined') return loading;
+    const params = new URLSearchParams(window.location.search);
+    const { access, refresh } = getTokens();
+    return loading && (!!access || !!refresh || (params.has('access_token') && params.has('refresh_token')));
+  }, [loading]);
 
   useEffect(() => {
     if (!open) return;
@@ -74,7 +81,7 @@ export default function MobileMenu({ open, onClose, links, user, loading = false
 
         <div className="space-y-3 border-t border-border px-5 py-5 pb-8 sm:px-6">
           <ThemeToggle className="w-full justify-center rounded-2xl bg-bg-secondary py-4 text-base text-text-primary" />
-          {loading ? (
+          {shouldShowLoadingState ? (
             <div className="h-12 animate-pulse rounded-lg border border-border bg-bg-tertiary" />
           ) : user ? (
             <>

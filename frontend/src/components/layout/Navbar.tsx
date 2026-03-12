@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
+import { getTokens } from '@/lib/api';
 import MobileMenu from './MobileMenu';
 import ThemeToggle from './ThemeToggle';
 import { navLinks, site } from '@/lib/site';
@@ -10,6 +11,12 @@ import { navLinks, site } from '@/lib/site';
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const shouldShowLoadingState = useMemo(() => {
+    if (typeof window === 'undefined') return loading;
+    const params = new URLSearchParams(window.location.search);
+    const { access, refresh } = getTokens();
+    return loading && (!!access || !!refresh || (params.has('access_token') && params.has('refresh_token')));
+  }, [loading]);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-bg-primary/80 backdrop-blur-lg">
@@ -30,7 +37,7 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-3 md:flex">
           <ThemeToggle compact />
-          {loading ? (
+          {shouldShowLoadingState ? (
             <div className="h-10 w-36 animate-pulse rounded-lg border border-border bg-bg-secondary" />
           ) : user ? (
             <>

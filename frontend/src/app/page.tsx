@@ -50,25 +50,25 @@ export default function HomePage() {
     <>
       <section className="relative overflow-hidden">
         <div className="fitlife-hero-glow absolute inset-0" />
-        <div className="relative mx-auto max-w-6xl px-4 pb-14 pt-16 sm:px-6 sm:pb-20 sm:pt-24">
+        <div className="relative mx-auto max-w-6xl px-4 pb-12 pt-14 sm:px-6 sm:pb-20 sm:pt-24">
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-flex rounded-full border border-accent/30 bg-accent-glow px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent sm:px-4 sm:text-xs sm:tracking-[0.24em]">
               FitLife AI
             </span>
-            <h1 className="mx-auto mt-5 max-w-[11ch] font-display text-[clamp(2.15rem,11.8vw,4.75rem)] font-bold leading-[0.94] tracking-tight sm:mt-6 sm:max-w-none sm:text-[clamp(2.75rem,11vw,4.75rem)] sm:leading-[0.98] lg:text-6xl">
+            <h1 className="mx-auto mt-5 max-w-[9.5ch] font-display text-[clamp(2rem,11vw,4.75rem)] font-bold leading-[0.92] tracking-tight sm:mt-6 sm:max-w-none sm:text-[clamp(2.75rem,11vw,4.75rem)] sm:leading-[0.98] lg:text-6xl">
               <span className="block">Labels, lifts, and</span>
               <span className="block">meals.</span>
               <br />
-              <span className="mt-2 block text-[0.86em] leading-[0.9] sm:mt-0 sm:text-[1em]">
+              <span className="mt-3 block text-[0.68em] leading-[0.88] sm:mt-0 sm:text-[1em]">
                 <HeroSlogan />
               </span>
             </h1>
-            <p className="mx-auto mt-5 max-w-[20rem] text-[15px] leading-8 text-text-secondary sm:mt-6 sm:max-w-2xl sm:text-lg sm:leading-relaxed">
+            <p className="mx-auto mt-5 max-w-[18.5rem] text-[14px] leading-7 text-text-secondary sm:mt-6 sm:max-w-2xl sm:text-lg sm:leading-relaxed">
               FitLife packages OCR nutrition scanning, video-based form analysis, and an AI meal coach into one product experience built with Next.js, Flask, computer vision, and grounded nutrition guidance.
             </p>
           </div>
 
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-2.5 sm:mt-10 sm:gap-3">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5 sm:mt-10 sm:gap-3">
             {heroSignals.map((signal) => (
               <div
                 key={signal}

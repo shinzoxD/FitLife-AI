@@ -35,11 +35,11 @@ export default function MobileMenu({ open, onClose, links, user, loading = false
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#081114]/94 md:hidden">
-      <div className="absolute inset-0 bg-black/45 backdrop-blur-sm" onClick={onClose} />
+    <div className="fixed inset-0 z-50 bg-bg-primary md:hidden">
+      <div className="absolute inset-0 bg-bg-primary" onClick={onClose} />
       <div
         ref={panelRef}
-        className="absolute inset-y-0 right-0 flex h-full w-full max-w-full flex-col border-l border-border bg-bg-primary shadow-2xl shadow-black/45 animate-in slide-in-from-right sm:w-[24rem]"
+        className="absolute inset-0 flex h-full w-full flex-col bg-bg-primary animate-in fade-in slide-in-from-right"
         role="dialog"
         aria-modal="true"
       >
@@ -73,7 +73,7 @@ export default function MobileMenu({ open, onClose, links, user, loading = false
         </nav>
 
         <div className="space-y-3 border-t border-border px-5 py-5 pb-8 sm:px-6">
-          <ThemeToggle className="w-full justify-center rounded-2xl bg-bg-secondary py-4 text-base" />
+          <ThemeToggle className="w-full justify-center rounded-2xl bg-bg-secondary py-4 text-base text-text-primary" />
           {loading ? (
             <div className="h-12 animate-pulse rounded-lg border border-border bg-bg-tertiary" />
           ) : user ? (

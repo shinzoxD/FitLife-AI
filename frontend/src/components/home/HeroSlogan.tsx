@@ -4,10 +4,10 @@ import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 const slogans = [
-  'One FitLife workflow.',
-  'Food and form, together.',
-  'Meals meet recovery.',
-  'Better choices, daily.',
+  'One smart routine.',
+  'Food and form.',
+  'Meals and recovery.',
+  'Better choices daily.',
 ];
 
 const HOLD_MS = 2200;

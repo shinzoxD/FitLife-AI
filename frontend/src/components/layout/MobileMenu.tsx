@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { createPortal } from 'react-dom';
 import type { User } from '@/lib/types';
 import { site } from '@/lib/site';
 import { getTokens } from '@/lib/api';
@@ -18,12 +19,17 @@ interface Props {
 
 export default function MobileMenu({ open, onClose, links, user, loading = false, onLogout }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   const shouldShowLoadingState = useMemo(() => {
     if (typeof window === 'undefined') return loading;
     const params = new URLSearchParams(window.location.search);
     const { access, refresh } = getTokens();
     return loading && (!!access || !!refresh || (params.has('access_token') && params.has('refresh_token')));
   }, [loading]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -39,9 +45,9 @@ export default function MobileMenu({ open, onClose, links, user, loading = false
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 bg-bg-primary md:hidden">
       <div className="absolute inset-0 bg-bg-primary" onClick={onClose} />
       <div
@@ -122,6 +128,7 @@ export default function MobileMenu({ open, onClose, links, user, loading = false
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

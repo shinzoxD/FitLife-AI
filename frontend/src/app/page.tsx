@@ -58,11 +58,10 @@ export default function HomePage() {
             <h1 className="mx-auto mt-5 max-w-[9.5ch] font-display text-[clamp(2rem,11vw,4.75rem)] font-bold leading-[0.92] tracking-tight sm:mt-6 sm:max-w-none sm:text-[clamp(2.75rem,11vw,4.75rem)] sm:leading-[0.98] lg:text-6xl">
               <span className="block">Labels, lifts, and</span>
               <span className="block">meals.</span>
-              <br />
-              <span className="mt-3 block text-[0.68em] leading-[0.88] sm:mt-0 sm:text-[1em]">
-                <HeroSlogan />
-              </span>
             </h1>
+            <div className="mt-3 text-center font-display text-[clamp(1.6rem,9vw,4rem)] font-bold leading-[0.94] tracking-tight text-accent sm:mt-4 sm:text-[clamp(2.1rem,8vw,3.6rem)]">
+              <HeroSlogan />
+            </div>
             <p className="mx-auto mt-5 max-w-[18.5rem] text-[14px] leading-7 text-text-secondary sm:mt-6 sm:max-w-2xl sm:text-lg sm:leading-relaxed">
               FitLife packages OCR nutrition scanning, video-based form analysis, and an AI meal coach into one product experience built with Next.js, Flask, computer vision, and grounded nutrition guidance.
             </p>

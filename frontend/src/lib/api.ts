@@ -1,4 +1,6 @@
-const API_BASE = `${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1`;
+const API_ROOT = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+const API_BASE = `${API_ROOT}/api/v1`;
+export const GOOGLE_AUTH_URL = `${API_ROOT}/auth/google`;
 
 export function getTokens() {
   if (typeof window === 'undefined') return { access: null, refresh: null };

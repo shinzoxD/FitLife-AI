@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
+import { GOOGLE_AUTH_URL } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Alert from '@/components/ui/Alert';
@@ -77,7 +78,7 @@ export default function RegisterPage() {
       </div>
 
       <a
-        href="/api/v1/auth/google"
+        href={GOOGLE_AUTH_URL}
         className="flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-bg-secondary px-4 py-3 text-sm transition-colors hover:border-border-hover"
       >
         <svg width="18" height="18" viewBox="0 0 24 24">

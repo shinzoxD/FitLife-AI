@@ -86,6 +86,14 @@ export default function MobileMenu({ open, onClose, links, user, loading = false
         </nav>
 
         <div className="space-y-3 border-t border-border px-5 py-5 pb-8 sm:px-6">
+          <a
+            href={site.backend.settingsUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="block w-full rounded-2xl border border-border bg-bg-secondary px-4 py-4 text-center text-base text-text-primary hover:bg-bg-elevated"
+          >
+            Backend
+          </a>
           <ThemeToggle className="w-full justify-center rounded-2xl bg-bg-secondary py-4 text-base text-text-primary" />
           {shouldShowLoadingState ? (
             <div className="h-12 animate-pulse rounded-lg border border-border bg-bg-tertiary" />

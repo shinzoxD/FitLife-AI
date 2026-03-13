@@ -36,6 +36,14 @@ export default function Navbar() {
         </ul>
 
         <div className="hidden items-center gap-3 md:flex">
+          <a
+            href={site.backend.settingsUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-lg border border-border px-4 py-2 text-sm text-text-secondary transition-colors hover:border-border-hover hover:text-text-primary"
+          >
+            Backend
+          </a>
           <ThemeToggle compact />
           {shouldShowLoadingState ? (
             <div className="h-10 w-36 animate-pulse rounded-lg border border-border bg-bg-secondary" />

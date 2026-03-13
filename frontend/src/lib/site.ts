@@ -4,6 +4,10 @@ export const site = {
   description:
     'FitLife is a full-stack wellness app that combines OCR nutrition scans, pose-based workout feedback, and an AI coach into one daily training workflow.',
   contactEmail: 'hello@fitlife.app',
+  backend: {
+    appUrl: 'https://shinzobolte-fitlife-ai.hf.space',
+    settingsUrl: 'https://huggingface.co/spaces/shinzobolte/fitlife-ai/settings',
+  },
 };
 
 export const navLinks = [

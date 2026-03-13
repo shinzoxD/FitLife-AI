@@ -87,7 +87,7 @@ export default function MobileMenu({ open, onClose, links, user, loading = false
 
         <div className="space-y-3 border-t border-border px-5 py-5 pb-8 sm:px-6">
           <a
-            href={site.backend.settingsUrl}
+            href={site.backend.appUrl}
             target="_blank"
             rel="noreferrer"
             className="block w-full rounded-2xl border border-border bg-bg-secondary px-4 py-4 text-center text-base text-text-primary hover:bg-bg-elevated"

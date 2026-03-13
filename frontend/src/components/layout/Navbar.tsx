@@ -37,7 +37,7 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-3 md:flex">
           <a
-            href={site.backend.settingsUrl}
+            href={site.backend.appUrl}
             target="_blank"
             rel="noreferrer"
             className="rounded-lg border border-border px-4 py-2 text-sm text-text-secondary transition-colors hover:border-border-hover hover:text-text-primary"
